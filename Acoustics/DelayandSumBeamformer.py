@@ -105,7 +105,9 @@ elevation=60
 pe=Preprocessor(interpolate=3)
 target_samplerate=48000
 sig_gen=SignalGen(16,spacing)
-speech,samplerate=sf.read(("C:/Users/arg/Documents/GitHub/EyeHear/Acoustics/AudioTests/test8.wav"))
+# speech,samplerate=sf.read(("C:/Users/arg/Documents/GitHub/EyeHear/Acoustics/AudioTests/test8.wav"))
+speech,samplerate=sf.read(("C:/Users/arg/Documents/GitHub/PDMAcoustics/Acoustics/PDMTests/1/channel.wav"))
+
 # interpolator=Preprocessor(mirrored=False,interpolate=int(np.ceil(target_samplerate/16000)))
 # print(speech.shape)
 # speech=np.reshape(speech,(-1,1))
@@ -127,7 +129,7 @@ speech,samplerate=sf.read(("C:/Users/arg/Documents/GitHub/EyeHear/Acoustics/Audi
 
 # spacing=np.array([[-0.1,-0.1,0],[-0.1,0.0,0],[-0.1,0.1,0],[0,-0.1,0],[0,0,0],[0,0.1,0],[0.1,-0.1,0],[0.1,0,0],[0.1,0.1,0]])
 beam=Beamformer(n_channels=16,coord=spacing)
-segments=21
+segments=7
 rms_data=np.zeros((segments,segments))
 azi=-90
 ele=-90

@@ -23,7 +23,7 @@
 
 import libm2k
 
-n_bits=4
+n_bits=1
 
 ctx=libm2k.m2kOpen()
 if ctx is None:
@@ -33,19 +33,41 @@ if ctx is None:
 dig=ctx.getDigital()
 dig.reset()
 
-dig.setSampleRateIn(2*12288000)
-dig.setSampleRateOut(0.5*12288000)
+dig.setSampleRateIn(2*3072000)
+dig.setSampleRateOut(2*3072000)
 
 for i in range(n_bits):
     dig.setDirection(i,libm2k.DIO_OUTPUT)
     dig.enableChannel(i,True)
 
-buff=range(4) # create 3 bit binary counter
 dig.setCyclic(True)
 dig.push([0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1])
 
 
-while True:
-    data = dig.getSamples(100)
-    for val in data:
-        print(bin(val))
+# while True:
+#     data = dig.getSamples(100)
+#     for val in data:
+#         print(bin(val))
+#         print((val >> 13) & 1)
+
+chosen_bits = [1,2,3,4,8,9,10,11]  
+
+data = dig.getSamples(2 * 3072000*3)
+
+# Create a separate file for each bit
+file_handles = {bit: open(f"output_bit_{bit}.txt", "w") for bit in chosen_bits}
+
+for val in data:
+    for bit in chosen_bits:
+        # Extract the specific bit value
+        bit_value = (val >> bit) & 1
+        # Write the corresponding value to the respective file
+        if bit_value == 1:
+            file_handles[bit].write("1\n")
+        else:
+            file_handles[bit].write("-1\n")
+
+# Close all file handles
+for file in file_handles.values():
+    file.close()
+

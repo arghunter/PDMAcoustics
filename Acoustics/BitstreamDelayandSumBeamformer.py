@@ -19,7 +19,7 @@ class Beamformer:
         self.sample_dur= 1/sample_rate *10**6 #Duration of a sample in microseconds
         self.delay_approx=DelayAproximator(self.coord)
         self.doa=0
-        self.update_delays(0)
+        self.update_delays(0,0)
         self.locked=False
     def beamform(self,samples):
         
@@ -60,14 +60,14 @@ class Beamformer:
         channel_shifts=np.round((self.delays/self.sample_dur))
         return channel_shifts
 
-    def update_delays(self,angle): #doa in degrees, assuming plane wave as it is a far-field source
+    def update_delays(self,azimuth,elevation): #doa in degrees, assuming plane wave as it is a far-field source
         # self.doa=doa
-        self.delays=np.array(self.delay_approx.get_delays(DelayAproximator.get_pos(angle,1)))*10**6
+        self.delays=np.array(self.delay_approx.get_flat_delays(azimuth,elevation))*10**6
         print(self.delays)
         shift=min(self.delays)
         self.delays+=-shift
-        # print("azi ele")
-        # print(str(azimuth)+" "+str(elevation))
+        print("azi ele")
+        print(str(azimuth)+" "+str(elevation))
         print("channel shift")
         print(self.calculate_channel_shift())
 
@@ -77,88 +77,140 @@ from Preprocessor import Preprocessor
 import soundfile as sf
 import PDMGenerator as pdm
 
+def get_data(filename,channel,length):
+    i=0
+    j=0
+    data=np.zeros((length))
+    with open(filename, 'r') as file:
+        line="  "
+
+        while(line!=""):
+            line=file.readline()
+            if(line==""):
+                break
+            i+=1
+            
+            if(i%2!=channel):
+                continue
+            data[j]=int(line.strip())
+            j+=1
+    return data
 # spacing=np.array([[-0.1,-0.1,0],[-0.1,0.0,0],[-0.1,0.1,0],[0,-0.1,0],[0,0,0],[0,0.1,0],[0.1,-0.1,0],[0.1,0,0],[0.1,0.1,0]])
 # spacing=np.array([[-0.2,-0.2,0],[-0.2,-0.1,0],[-0.2,0.1,0],[-0.2,0.2,0],[-0.1,-0.2,0],[-0.1,-0.1,0],[-0.1,0.1,0],[-0.1,0.2,0],[0.1,-0.2,0],[0.1,-0.1,0],[0.1,0.1,0],[0.1,0.2,0],[0.2,-0.2,0],[0.2,-0.1,0],[0.2,0.1,0],[0.2,0.2,0]])
 # spacing=np.array([[-0.18,0.12,0],[-0.06,0.12,0],[0.06,0.12,0],[0.18,0.12,0],[-0.18,0,0],[-0.06,0,0],[0.06,0,0],[0.18,0,0],[-0.18,-0.12,0],[-0.06,-0.12,0],[0.06,-0.12,0],[0.18,-0.12,0]])
 # spacing=np.array([[-0.08,0.042],[-0.08,0.014],[-0.08,-0.028],[-0.08,-0.042],[0.08,0.042],[0.08,0.014],[0.08,-0.028],[0.08,-0.042]])
-spacing=np.array([[0,0],[0.028,0],[0.056,0],[0.084,0],[0.112,0],[0.14,0],[0.168,0],[0.196,0]])
-import CICFilterTest as cic
+# spacing=np.array([[0,0],[0.028,0],[0.056,0],[0.084,0],[0.112,0],[0.14,0],[0.168,0],[0.196,0]])
+spacing=np.array([[-0.06,-0.24,0],[-0.18,-0.24,0],[-0.06,-0.12,0],[-0.18,-0.12,0],[-0.06,0,0],[-0.18,0,0],[-0.06,0.12,0],[-0.18,0.12,0],[0.18,-0.24,0],[0.06,-0.24,0],[0.18,-0.12,0],[0.06,-0.12,0],[0.18,0,0],[0.06,0,0],[0.18,0.12,0],[0.06,0.12,0]])
+
+import CICFilter as cic
 
 # sig=Sine(1500,0.5,48000)
 azimuth=60
 elevation=60
-beam=Beamformer(n_channels=8,coord=spacing,sample_rate=48000*64)
+beam=Beamformer(n_channels=16,coord=spacing,sample_rate=48000*64)
 samplerate=48000*64
-duration=0.05
-beam.update_delays(0)
-delays= beam.calculate_channel_shift()
-data= np.zeros((8,int(samplerate*duration)))
-noise=0.2
-segments=32;
-rms_data= np.zeros(segments)
-for i in range(8):
-    data[i]=pdm.generate_pdm_sinewave(1000,samplerate,duration,delays[i],noise)
+duration=3
 
+data= np.zeros((16,int(samplerate*(0.75))))
+
+
+length=int(samplerate*duration)
+data[0]=(get_data("./Acoustics/PDMTests/1/output_bit_1.txt",0,length))[0:int(48000*64*0.75)]
+print("Stream 1 Complete")
+data[1]=get_data("./Acoustics/PDMTests/1/output_bit_1.txt",1,length)[0:int(48000*64*0.75)]
+print("Stream 2 Complete")
+data[2]=get_data("./Acoustics/PDMTests/1/output_bit_2.txt",0,length)[0:int(48000*64*0.75)]
+print("Stream 3 Complete")
+data[3]=get_data("./Acoustics/PDMTests/1/output_bit_2.txt",1,length)[0:int(48000*64*0.75)]
+print("Stream 4 Complete")
+data[4]=get_data("./Acoustics/PDMTests/1/output_bit_3.txt",0,length)[0:int(48000*64*0.75)]
+print("Stream 5 Complete")
+data[5]=get_data("./Acoustics/PDMTests/1/output_bit_3.txt",1,length)[0:int(48000*64*0.75)]
+print("Stream 6 Complete")
+data[6]=get_data("./Acoustics/PDMTests/1/output_bit_4.txt",0,length)[0:int(48000*64*0.75)]
+print("Stream 7 Complete")
+data[7]=get_data("./Acoustics/PDMTests/1/output_bit_4.txt",1,length)[0:int(48000*64*0.75)]
+print("Stream 8 Complete")
+data[8]=get_data("./Acoustics/PDMTests/1/output_bit_8.txt",0,length)[0:int(48000*64*0.75)]
+print("Stream 9 Complete")
+data[9]=get_data("./Acoustics/PDMTests/1/output_bit_8.txt",1,length)[0:int(48000*64*0.75)]
+print("Stream 10 Complete")
+data[10]=get_data("./Acoustics/PDMTests/1/output_bit_9.txt",0,length)[0:int(48000*64*0.75)]
+print("Stream 11 Complete")
+data[11]=get_data("./Acoustics/PDMTests/1/output_bit_9.txt",1,length)[0:int(48000*64*0.75)]
+print("Stream 12 Complete")
+data[12]=get_data("./Acoustics/PDMTests/1/output_bit_10.txt",0,length)[0:int(48000*64*0.75)]
+print("Stream 13 Complete")
+data[13]=get_data("./Acoustics/PDMTests/1/output_bit_10.txt",1,length)[0:int(48000*64*0.75)]
+print("Stream 14 Complete")
+data[14]=get_data("./Acoustics/PDMTests/1/output_bit_11.txt",0,length)[0:int(48000*64*0.75)]
+print("Stream 15 Complete")
+data[15]=get_data("./Acoustics/PDMTests/1/output_bit_11.txt",1,length)[0:int(48000*64*0.75)]
+print("Stream 16 Complete")
+print("Data Collected")
+segments=5
+rms_data=np.zeros((segments,segments))
+azi=-90
+ele=-90
+
+# # beam.update_delays(30,0)
+# outdata=beam.beamform(data.T)
+# print(data.shape)
+# print("sfsgfdjkh")
+# print(outdata.shape)
+# outdatapcm=cic.cic(outdata)
+# print("fjkhsjkdfhjkhs")
+# print(outdatapcm.shape)
+# outdatapcm/=np.max(outdatapcm)
+
+# from scipy.io.wavfile import write,read
+# write("./Acoustics/PDMTests/1/beamformedchannel.wav", 48000,outdatapcm)
 for i in range(segments):
-    print(i)
-    beam.update_delays((360/segments)*i)
-    outdata=beam.beamform(data.T)
-    print(outdata.shape)
-    outdatapcm=cic.cic(outdata)
-    rms_data[i]=np.mean(outdatapcm**2)
-print(rms_data) 
+    for j in range(segments):
+        
+        # io=IOStream()
+        # io.arrToStream(speech,48000)
+        print(i)
+        beam.update_delays(azi+(180/segments)/2,ele+(180/segments)/2)
+        outdata=beam.beamform(data.T)
+        outdatapcm=cic.cic(outdata)
+        rms_data[i][j]=np.mean(outdatapcm**2)
+        
+        ele+=180/segments
+        print(rms_data)
+    ele=-90
+    azi+=180/segments
+print(rms_data)
+
 
 import numpy as np
 import matplotlib.pyplot as plt
 
-# Example `rms_data` values and setup
-# Number of segments and distances (you can adjust this)
-segments = len(rms_data)
-distances = 100  # Number of distance levels (bins) per segment
-# rms_data=np.roll(rms_data,-int(segments/4))
-# Generate theta values for the polar plot
-theta = np.linspace(0, 2 * np.pi, segments + 1)  # Add one to close the circle
-rms_data_normalized = rms_data / np.max(rms_data)  # Normalize the RMS data
-rms_data_normalized = np.append(rms_data_normalized, rms_data_normalized[0])  # Close the circle
 
-# Extend theta to form the bins
-theta_grid, radius_grid = np.meshgrid(theta, np.linspace(0, 1, distances))
+segments = rms_data.shape[0]
+azi_angles = np.linspace(-90, 90, segments)  # Azimuth angles
+ele_angles = np.linspace(-90, 90, segments)  # Elevation angles
 
-# Initialize a matrix for RMS data corresponding to each distance bin
-rms_data_grid = np.tile(rms_data_normalized, (distances, 1))
-for i in range(segments):
-    for j in range(distances):
-        
-        rms_data_grid[j][i]=0
-# for i in range(segments):
-#     for j in range(segments):
-        
-#         rms_data_grid[int(rms_data_normalized[i]*distances)-1][j]=rms_data_normalized[i]
-for i in range(segments+1):
-        for j in range(int((1-np.sqrt(rms_data_normalized[i]))*(distances-1)),distances):
-            rms_data_grid[j][i]=rms_data_normalized[i]
-        for j in range(int((1-np.sqrt(rms_data_normalized[i]))*(distances-1))):
-            rms_data_grid[j][i]=rms_data_normalized[i]/(((np.sqrt(rms_data_normalized[i])))/((float(distances)-j)/distances))**2
+# Create a meshgrid for azimuth and elevation
+azi_grid, ele_grid = np.meshgrid(azi_angles, ele_angles)
 
+# Normalize RMS data for visualization
+rms_data_normalized = rms_data / np.max(rms_data)
 
-# Create a filled polar heatmap
-fig, ax = plt.subplots(subplot_kw={'projection': 'polar'})
-heatmap = ax.pcolormesh(theta_grid, radius_grid, rms_data_grid, cmap='jet', shading='auto')
+# Plot the heatmap
+plt.figure(figsize=(10, 7))
+plt.pcolormesh(azi_grid, ele_grid, rms_data_normalized, shading='auto', cmap='viridis')
+plt.colorbar(label="Normalized RMS Power")
+plt.xlabel("Azimuth (°)")
+plt.ylabel("Elevation (°)")
+plt.title("RMS Power Distribution (Azimuth-Elevation Plane)")
 
-# Add a marker for the sound source
-angle = 60  # Example angle
-# source_theta = np.deg2rad(angle)
-# ax.plot(source_theta, 1, 'ro', label=f'Sound Source ({angle}°)', markersize=10)
-
-# Add a colorbar
-cbar = plt.colorbar(heatmap, ax=ax, orientation='vertical')
-cbar.set_label('Normalized RMS Power')
-
-# Add labels, legend, and title
-ax.legend(loc='upper right', bbox_to_anchor=(1.2, 1.1))
-ax.set_title('Circular Heatmap of RMS Power')
-ax.grid(False)
-ax.set_yticklabels([])
+# Highlight maximum RMS power point
+max_idx = np.unravel_index(np.argmax(rms_data), rms_data.shape)
+max_azi = azi_angles[max_idx[1]]
+max_ele = ele_angles[max_idx[0]]
+plt.scatter(max_azi, max_ele, color='red', label="Strongest RMS Power", zorder=5)
+plt.legend()
 
 plt.show()
 
