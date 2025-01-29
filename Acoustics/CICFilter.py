@@ -15,7 +15,7 @@ def binary_to_decimal(binary_str):
     else:
         return int(binary_str, 2)
 
-def decimal_to_binary(decimal, bits=19):
+def decimal_to_binary(decimal, bits=23):
     """
     Convert a decimal integer to a two's complement binary string of 32 bits.
     """
@@ -24,7 +24,7 @@ def decimal_to_binary(decimal, bits=19):
     binary_str = bin(decimal)[2:]  # convert to binary and remove '0b' prefix
     return binary_str.zfill(bits)
 
-def twos_complement_addition(bin1, bin2, bits=19):
+def twos_complement_addition(bin1, bin2, bits=23):
     """
     Perform two's complement binary addition with 32-bit padding.
     """
@@ -45,14 +45,14 @@ def twos_complement_addition(bin1, bin2, bits=19):
         result_decimal += 2 * max_value
 
     return decimal_to_binary(result_decimal, bits)
-def binary_not(binary_str, bits=19):
+def binary_not(binary_str, bits=23):
     """
     Perform bitwise NOT operation on a binary string with 32-bit padding.
     """
     binary_str = binary_str.zfill(bits)
     return ''.join('1' if b == '0' else '0' for b in binary_str)
 
-def twos_complement_subtraction(bin1, bin2, bits=19):
+def twos_complement_subtraction(bin1, bin2, bits=23):
     """
     Perform two's complement binary subtraction with 32-bit padding.
     """
@@ -85,7 +85,7 @@ def cic(arr):
     for line in arr:
         # line=file.readline()
 
-        
+
         count2+=1
         int1=twos_complement_addition(int1,decimal_to_binary(int(line)))
         in_array.append(decimal_to_binary(int(line)))
