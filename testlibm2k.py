@@ -33,8 +33,8 @@ if ctx is None:
 dig=ctx.getDigital()
 dig.reset()
 
-dig.setSampleRateIn(2*3072000)
-dig.setSampleRateOut(2*3072000)
+dig.setSampleRateIn(4*3072000)
+dig.setSampleRateOut(4*3072000)
 
 for i in range(n_bits):
     dig.setDirection(i,libm2k.DIO_OUTPUT)
@@ -50,12 +50,12 @@ dig.push([0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1])
 #         print(bin(val))
 #         print((val >> 13) & 1)
 
-chosen_bits = [1,2,3,4,8,9,10,11]  
+chosen_bits = [8]  
 
-data = dig.getSamples(2 * 3072000*3)
+data = dig.getSamples(int(4 * 3072000*0.5))
 
 # Create a separate file for each bit
-file_handles = {bit: open(f"output_bit_{bit}.txt", "w") for bit in chosen_bits}
+file_handles = {bit: open(f"uoutput_bit_{bit}.txt", "w") for bit in chosen_bits}
 
 for val in data:
     for bit in chosen_bits:

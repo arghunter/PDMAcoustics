@@ -27,11 +27,11 @@ class Beamformer:
         samples,max_sample_shift=self.delay_and_gain(samples)
        
         samples=self.sum_channels(samples)
-        # if hasattr(self,'last_overlap'):
-        #     for i in range(self.last_overlap.shape[0]):
-        #         samples[i]+=self.last_overlap[i]
+        if hasattr(self,'last_overlap'):
+            for i in range(self.last_overlap.shape[0]):
+                samples[i]+=self.last_overlap[i]
         
-        # self.last_overlap=samples[samples.shape[0]-max_sample_shift:samples.shape[0]]
+        self.last_overlap=samples[samples.shape[0]-max_sample_shift:samples.shape[0]]
  
         
 
@@ -45,19 +45,37 @@ class Beamformer:
     def delay_and_gain(self, samples):
         #backwards interpolations solves every prblem
         shifts=self.calculate_channel_shift()
-        delayed=np.zeros(samples.shape)
-        max_sample_shift=int(max(shifts))
+
+        intshifts=np.floor(shifts)
+        max_sample_shift=int(max(intshifts))
+        dims = samples.shape
+        dims=(int(dims[0]+max_sample_shift),dims[1])
+        delayed = np.zeros(dims)
+        if hasattr(self,'last_samples'):
+            
+            for i in range(self.n_channels):
+                intermult=1-(shifts[i]%1)
+                shiftdiff=max_sample_shift-int(intshifts[i])
+                delayed[0+shiftdiff][i]=self.gains[i]*((samples[0][i]-self.last_samples[len(self.last_samples)-1][i])*(intermult)+self.last_samples[len(self.last_samples)-1][i])               
+        else:
+            for i in range(self.n_channels):
+                intermult=1-(shifts[i]%1)
+                shiftdiff=max_sample_shift-int(intshifts[i])
+                delayed[0+shiftdiff][i]=(self.gains[i]*(samples[0][i]-0)*(intermult))               
+        
         for i in range(self.n_channels):
-            
-            delayed.T[i]=np.roll(samples.T[i],-int(shifts[i]))# make pos if wierd          
+            intermult=1-(shifts[i]%1)
+            shiftdiff=max_sample_shift-int(intshifts[i])
+            for j in range(1,dims[0]-max_sample_shift):
+                delayed[j+shiftdiff][i]=self.gains[i]*((samples[j][i]-samples[j-1][i])*(intermult)+samples[j-1][i])               
             
         
-        
+        self.last_samples=samples
        
         return delayed,max_sample_shift
     #calculates number of samples to delay
     def calculate_channel_shift(self):
-        channel_shifts=np.round((self.delays/self.sample_dur))
+        channel_shifts=(self.delays/self.sample_dur)
         return channel_shifts
 
     def update_delays(self,azimuth,elevation): #doa in degrees, assuming plane wave as it is a far-field source
@@ -70,7 +88,6 @@ class Beamformer:
         print(str(azimuth)+" "+str(elevation))
         print("channel shift")
         print(self.calculate_channel_shift())
-
 
 from SignalGen import SignalGen
 from Preprocessor import Preprocessor

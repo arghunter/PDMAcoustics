@@ -105,7 +105,7 @@ def cic(arr):
             # line=file.readline()
     nparr=np.array(out_array, dtype=float)
     print(max(nparr))
-    nparr/=max(nparr)
+    # nparr/=max(nparr)
     return nparr
     # print(len(nparr))
     # write("cictest.wav", 48000,np.array(out_array))
