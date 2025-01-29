@@ -34,7 +34,7 @@ number_of_samples = 1024
 clock_frequency = 75000000
 digital_sampling_frequency = 1000000000
 samples_per_period = 1024
-digital_ch = 1
+digital_ch = 15
 clock_ch = 0
 acquisition_buffer_size = 4096
 
@@ -97,12 +97,12 @@ for i in range(8):
 
 digital_data = dig.getSamples(acquisition_buffer_size)
 
-chosen_bits = [1]  
+chosen_bits = [1,2,3,4,8,9,10,11]    
 
-data = dig.getSamples(int(4 * 3072000*0.5))
+data = dig.getSamples(int(2 * 3072000*2))
 
 # Create a separate file for each bit
-file_handles = {bit: open(f"poutput_bit_{bit}.txt", "w") for bit in chosen_bits}
+file_handles = {bit: open(f"output_bit_{bit}.txt", "w") for bit in chosen_bits}
 
 for val in data:
     for bit in chosen_bits:

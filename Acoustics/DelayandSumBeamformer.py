@@ -106,7 +106,7 @@ pe=Preprocessor(interpolate=3)
 target_samplerate=48000
 sig_gen=SignalGen(16,spacing)
 # speech,samplerate=sf.read(("C:/Users/arg/Documents/GitHub/EyeHear/Acoustics/AudioTests/test8.wav"))
-speech,samplerate=sf.read(("C:/Users/arg/Documents/GitHub/PDMAcoustics/Acoustics/PDMTests/1/channel.wav"))
+speech,samplerate=sf.read(("C:/Users/arg/Documents/GitHub/PDMAcoustics/Acoustics/PDMTests/22/channel.wav"))
 
 # interpolator=Preprocessor(mirrored=False,interpolate=int(np.ceil(target_samplerate/16000)))
 # print(speech.shape)
