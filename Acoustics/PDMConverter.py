@@ -16,13 +16,9 @@ def get_data(filename, channel, length):
                 break
             
             # Extract data for the specified channel
-            if i % 4 == channel:  # Select bits based on DDR format
+            if i % 2 == channel:  # Select bits based on DDR format
                 data[j] = int(line.strip())  # Convert line to int and store in data
-                data[j+1] = int(line.strip())
-                line = file.readline()
-                if not line:  # End of file
-                    break 
-                j += 2  # Increment output index
+                j += 1  # Increment output index
             
             i += 1  # Increment bit index
 
@@ -37,15 +33,12 @@ data= np.zeros((16,int(samplerate*(duration))))
 
 print(False==False)
 length=int(samplerate*duration)
-data[0]=get_data("./Acoustics/PDMTests/18/output_bit_1.txt",0,length)
+data[0]=get_data("./Acoustics/PDMTests/19/output_bit_1.txt",0,length)
 print("Stream 1 Complete")
-with open("./Acoustics/PDMTests/18/output_bit_1_sdr3.txt", 'w') as file:
-    for integer in data[0]:
-        file.write(f"{int(integer)}\n")
-data[1]=get_data("./Acoustics/PDMTests/18/output_bit_1.txt",1,length)
-with open("./Acoustics/PDMTests/18/output_bit_1_sdr4.txt", 'w') as file:
-    for integer in data[1]:
-        file.write(f"{int(integer)}\n")
+# with open("./Acoustics/PDMTests/17/output_bit_1_sdr.txt", 'w') as file:
+#     for integer in data[0]:
+#         file.write(f"{integer}\n")
+data[1]=get_data("./Acoustics/PDMTests/19/output_bit_1.txt",1,length)
 print("Stream 2 Complete")
 # data[2]=get_data("./Acoustics/PDMTests/6/output_bit_2.txt",0,length)
 # print("Stream 3 Complete")
@@ -83,4 +76,4 @@ for i in range(2):
     outdata[i]=cic.cic(data[i])
     print("Channel"+str(i)+" Complete")
 outdata/=np.max(outdata)
-write("./Acoustics/PDMTests/18/channel.wav", 48000,outdata.T)
+write("./Acoustics/PDMTests/19/channel.wav", 48000,outdata.T)
