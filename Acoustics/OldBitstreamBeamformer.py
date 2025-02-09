@@ -52,8 +52,6 @@ class Beamformer:
             delayed.T[i]=np.roll(samples.T[i],-int(shifts[i]))# make pos if wierd
 
 
-
-
         return delayed,max_sample_shift
     #calculates number of samples to delay
     def calculate_channel_shift(self):
@@ -61,7 +59,6 @@ class Beamformer:
         return channel_shifts
 
     def update_delays(self,azimuth,elevation): #doa in degrees, assuming plane wave as it is a far-field source
-        # self.doa=doa
         self.delays=np.array(self.delay_approx.get_flat_delays(azimuth,elevation))*10**6
         print(self.delays)
         shift=min(self.delays)

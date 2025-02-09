@@ -62,16 +62,17 @@ aout.reset()
 
 ctx.calibrateDAC()
 ctx.calibrateADC()
-
+import time
+time.sleep(3)
 # AnalogOut setup
 
-aout.setCyclic(True)
-aout.enableChannel(clock_ch, True)
-aout.setSampleRate(clock_ch, max_dac_sample_rate)
-oversampling_ratio = max_dac_sample_rate/(clock_frequency * number_of_samples)
-aout.setOversamplingRatio(clock_ch, int(oversampling_ratio))
-buffer = generate_clock_signal(number_of_samples)
-aout.push(clock_ch, buffer)
+# aout.setCyclic(True)
+# aout.enableChannel(clock_ch, True)
+# aout.setSampleRate(clock_ch, max_dac_sample_rate)
+# oversampling_ratio = max_dac_sample_rate/(clock_frequency * number_of_samples)
+# aout.setOversamplingRatio(clock_ch, int(oversampling_ratio))
+# buffer = generate_clock_signal(number_of_samples)
+# aout.push(clock_ch, buffer)
 
 # Digital Setup
 
@@ -90,17 +91,18 @@ duty = samples_per_period / 2  # 50%
 signal = np.arange(samples_per_period) < duty
 digital_buffer = list(map(lambda s: int(s) << digital_ch, signal))  # generate signal on desired channel
 
-for i in range(8):
-    buffer.extend(buffer)
+# for i in range(8):
+#     buffer.extend(buffer)
 
 # dig.push(digital_buffer)
 
-digital_data = dig.getSamples(acquisition_buffer_size)
+# digital_data = dig.getSamples(acquisition_buffer_size)
 
 chosen_bits = [1,2,3,4,8,9,10,11]    
-
+# data = dig.getSamples(int(2 * 3072000*2))
+print("Data Collection Started")
 data = dig.getSamples(int(2 * 3072000*2))
-
+print("Data Collection FInished")
 # Create a separate file for each bit
 file_handles = {bit: open(f"output_bit_{bit}.txt", "w") for bit in chosen_bits}
 

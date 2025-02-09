@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.io.wavfile import write,read
 import soundfile as sf
-filename="./Acoustics/PDMTests/18/output_bit_1_sdr3.txt"
+filename="./Acoustics/PDMTests/27/output_bit_8.txt"
 import matplotlib
 # matplotlib.use("Qt5Agg")
 def binary_to_decimal(binary_str):
@@ -90,7 +90,7 @@ with open(filename, 'r') as file:
         if(line==""):
             break
         i+=1
-        if(i%2==3):
+        if(i%2==1):
             continue
         count2+=1
         int1=twos_complement_addition(int1,decimal_to_binary(int(line.strip())))
@@ -113,7 +113,7 @@ nparr=np.array(out_array, dtype=float)
 print(max(nparr))
 nparr/=max(nparr)
 print(len(nparr))
-write("cictest8.wav", 48000,nparr)
+write("cictest10wav", 48000,nparr)
 plt.plot(nparr[0:2000])
 plt.show()
 # nparr=np.array(in_array, dtype=float)
