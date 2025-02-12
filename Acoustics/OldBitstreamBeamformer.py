@@ -24,9 +24,18 @@ class Beamformer:
     def beamform(self,samples):
 
         sample_save=samples
-        samples,max_sample_shift=self.delay_and_gain(samples)
+        shifts=(self.calculate_channel_shift()).astype(int)
+        delayed=np.zeros(samples.shape)
 
-        samples=self.sum_channels(samples)
+        max_sample_shift=int(max(shifts))
+        summed=np.zeros(samples.shape[0])
+        for j in range(samples.shape[0]-max_sample_shift):
+            for i in range(self.n_channels):
+                summed[j] += samples[j+shifts[i]][i].sum()
+
+        # samples,max_sample_shift=self.delay_and_gain(samples)
+
+        # samples=self.sum_channels(samples)
         # if hasattr(self,'last_overlap'):
         #     for i in range(self.last_overlap.shape[0]):
         #         samples[i]+=self.last_overlap[i]
@@ -35,7 +44,7 @@ class Beamformer:
 
 
 
-        return samples[0:samples.shape[0]-max_sample_shift]
+        return summed[0:summed.shape[0]-max_sample_shift]
 
     def sum_channels(self,samples):
         summed=np.zeros(samples.shape[0])
@@ -47,6 +56,7 @@ class Beamformer:
         shifts=self.calculate_channel_shift()
         delayed=np.zeros(samples.shape)
         max_sample_shift=int(max(shifts))
+
         for i in range(self.n_channels):
 
             delayed.T[i]=np.roll(samples.T[i],-int(shifts[i]))# make pos if wierd
@@ -107,46 +117,47 @@ elevation=60
 beam=Beamformer(n_channels=16,coord=spacing,sample_rate=48000*64)
 samplerate=48000*64
 duration=2
-
-data= np.zeros((16,int(samplerate*(0.75))))
+subduration=0.75
+data= np.zeros((16,int(samplerate*(subduration))))
 
 
 length=int(samplerate*duration)
-data[0]=(get_data("./Acoustics/PDMTests/23/output_bit_1.txt",0,length))[0:int(48000*64*0.75)]
+data[0]=(get_data("./Acoustics/PDMTests/53/output_bit_1.txt",0,length))[0:int(48000*64*subduration)]
 print("Stream 1 Complete")
-data[1]=get_data("./Acoustics/PDMTests/23/output_bit_1.txt",1,length)[0:int(48000*64*0.75)]
+data[1]=get_data("./Acoustics/PDMTests/53/output_bit_1.txt",1,length)[0:int(48000*64*subduration)]
 print("Stream 2 Complete")
-data[2]=get_data("./Acoustics/PDMTests/23/output_bit_2.txt",0,length)[0:int(48000*64*0.75)]
+data[2]=get_data("./Acoustics/PDMTests/53/output_bit_2.txt",0,length)[0:int(48000*64*subduration)]
 print("Stream 3 Complete")
-data[3]=get_data("./Acoustics/PDMTests/23/output_bit_2.txt",1,length)[0:int(48000*64*0.75)]
+data[3]=get_data("./Acoustics/PDMTests/53/output_bit_2.txt",1,length)[0:int(48000*64*subduration)]
 print("Stream 4 Complete")
-data[4]=get_data("./Acoustics/PDMTests/23/output_bit_3.txt",0,length)[0:int(48000*64*0.75)]
+data[4]=get_data("./Acoustics/PDMTests/53/output_bit_3.txt",0,length)[0:int(48000*64*subduration)]
 print("Stream 5 Complete")
-data[5]=get_data("./Acoustics/PDMTests/23/output_bit_3.txt",1,length)[0:int(48000*64*0.75)]
+data[5]=get_data("./Acoustics/PDMTests/53/output_bit_3.txt",1,length)[0:int(48000*64*subduration)]
 print("Stream 6 Complete")
-data[6]=get_data("./Acoustics/PDMTests/23/output_bit_4.txt",0,length)[0:int(48000*64*0.75)]
+data[6]=get_data("./Acoustics/PDMTests/53/output_bit_4.txt",0,length)[0:int(48000*64*subduration)]
 print("Stream 7 Complete")
-data[7]=get_data("./Acoustics/PDMTests/23/output_bit_4.txt",1,length)[0:int(48000*64*0.75)]
+data[7]=get_data("./Acoustics/PDMTests/53/output_bit_4.txt",1,length)[0:int(48000*64*subduration)]
 print("Stream 8 Complete")
-data[8]=get_data("./Acoustics/PDMTests/23/output_bit_8.txt",0,length)[0:int(48000*64*0.75)]
+data[8]=get_data("./Acoustics/PDMTests/53/output_bit_8.txt",0,length)[0:int(48000*64*subduration)]
 print("Stream 9 Complete")
-data[9]=get_data("./Acoustics/PDMTests/23/output_bit_8.txt",1,length)[0:int(48000*64*0.75)]
+data[9]=get_data("./Acoustics/PDMTests/53/output_bit_8.txt",1,length)[0:int(48000*64*subduration)]
 print("Stream 10 Complete")
-data[10]=get_data("./Acoustics/PDMTests/23/output_bit_9.txt",0,length)[0:int(48000*64*0.75)]
+data[10]=get_data("./Acoustics/PDMTests/53/output_bit_9.txt",0,length)[0:int(48000*64*subduration)]
 print("Stream 11 Complete")
-data[11]=get_data("./Acoustics/PDMTests/23/output_bit_9.txt",1,length)[0:int(48000*64*0.75)]
+data[11]=get_data("./Acoustics/PDMTests/53/output_bit_9.txt",1,length)[0:int(48000*64*subduration)]
 print("Stream 12 Complete")
-data[12]=get_data("./Acoustics/PDMTests/23/output_bit_10.txt",0,length)[0:int(48000*64*0.75)]
+data[12]=get_data("./Acoustics/PDMTests/53/output_bit_10.txt",0,length)[0:int(48000*64*subduration)]
 print("Stream 13 Complete")
-data[13]=get_data("./Acoustics/PDMTests/23/output_bit_10.txt",1,length)[0:int(48000*64*0.75)]
+data[13]=get_data("./Acoustics/PDMTests/53/output_bit_10.txt",1,length)[0:int(48000*64*subduration)]
 print("Stream 14 Complete")
-data[14]=get_data("./Acoustics/PDMTests/23/output_bit_11.txt",0,length)[0:int(48000*64*0.75)]
+data[14]=get_data("./Acoustics/PDMTests/53/output_bit_11.txt",0,length)[0:int(48000*64*subduration)]
 print("Stream 15 Complete")
-data[15]=get_data("./Acoustics/PDMTests/23/output_bit_11.txt",1,length)[0:int(48000*64*0.75)]
+data[15]=get_data("./Acoustics/PDMTests/53/output_bit_11.txt",1,length)[0:int(48000*64*subduration)]
 print("Stream 16 Complete")
 print("Data Collected")
-segments=21
-rms_data=np.zeros((segments,segments))
+segments=7
+time_segs=np.ceil(subduration*10)
+rms_data=np.zeros((segments,segments,time_segs))
 azi=-90
 ele=-90
 
