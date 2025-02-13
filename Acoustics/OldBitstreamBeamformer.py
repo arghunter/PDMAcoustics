@@ -24,6 +24,14 @@ class Beamformer:
     def beamform(self,samples):
 
         sample_save=samples
+        outdata= np.zeros((self.n_channels))
+        for i in range(self.n_channels):
+            outdata[i]=np.mean(data[i][0:2048])
+            if(outdata[i]>=0.002):
+                samples.T[i]=0
+        if(outdata[0]<=0.002):
+            samples=np.roll(samples.T,1).T
+        # print(samples)
         # shifts=(self.calculate_channel_shift()).astype(int)
 
         # max_sample_shift=int(max(shifts))
@@ -116,7 +124,7 @@ elevation=60
 beam=Beamformer(n_channels=16,coord=spacing,sample_rate=48000*64)
 samplerate=48000*64
 duration=2
-subduration=0.8
+subduration=2
 data= np.zeros((16,int(samplerate*(subduration))))
 
 
@@ -154,12 +162,13 @@ print("Stream 15 Complete")
 data[15]=get_data("./Acoustics/PDMTests/55/output_bit_11.txt",1,length)[0:int(48000*64*subduration)]
 print("Stream 16 Complete")
 print("Data Collected")
-segments=7
+segments=9
 time_segs=int(np.ceil(subduration*10))
 rms_data=np.zeros((segments,segments,int(time_segs)))
 azi=-90
 ele=-90
 
+import time
 # # beam.update_delays(30,0)
 # outdata=beam.beamform(data.T)
 # print(data.shape)
@@ -196,8 +205,9 @@ for i in range(segments):
     ele=-90
     azi+=180/segments
 print(rms_data)
-
-
+import os
+os.makedirs("./Acoustics/PDMTests/55/rms_frames"+str(segments)+"_"+str(subduration), exist_ok=True)
+np.save("./Acoustics/PDMTests/55/rms_data_"+str(segments)+"_"+str(subduration)+".npy", rms_data)
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -237,10 +247,11 @@ def update(frame):
     max_point.set_data([max_azi], [max_ele])  # Wrap values in lists
 
     ax.set_title(f"RMS Power Distribution (Time Step {frame})")
+    plt.savefig(os.path.join("./Acoustics/PDMTests/55/rms_frames"+str(segments)+"_"+str(subduration), f"frame_{frame:03d}.png"))
 
 # Create animation
 ani = animation.FuncAnimation(fig, update, frames=time_steps, interval=200, repeat=True)
-
+ani.save("./Acoustics/PDMTests/55/rms_animation"+str(segments)+"_"+str(subduration)+".gif", writer="Pillow", fps=10)
 plt.show()
 
 
