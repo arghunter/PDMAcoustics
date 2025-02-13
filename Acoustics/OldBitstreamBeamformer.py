@@ -24,18 +24,17 @@ class Beamformer:
     def beamform(self,samples):
 
         sample_save=samples
-        shifts=(self.calculate_channel_shift()).astype(int)
-        delayed=np.zeros(samples.shape)
+        # shifts=(self.calculate_channel_shift()).astype(int)
 
-        max_sample_shift=int(max(shifts))
-        summed=np.zeros(samples.shape[0])
-        for j in range(samples.shape[0]-max_sample_shift):
-            for i in range(self.n_channels):
-                summed[j] += samples[j+shifts[i]][i].sum()
+        # max_sample_shift=int(max(shifts))
+        # summed=np.zeros(samples.shape[0])
+        # for j in range(samples.shape[0]-max_sample_shift):
+        #     for i in range(self.n_channels):
+        #         summed[j] += samples[j+shifts[i]][i].sum()
 
-        # samples,max_sample_shift=self.delay_and_gain(samples)
+        samples,max_sample_shift=self.delay_and_gain(samples)
 
-        # samples=self.sum_channels(samples)
+        samples=self.sum_channels(samples)
         # if hasattr(self,'last_overlap'):
         #     for i in range(self.last_overlap.shape[0]):
         #         samples[i]+=self.last_overlap[i]
@@ -44,7 +43,7 @@ class Beamformer:
 
 
 
-        return summed[0:summed.shape[0]-max_sample_shift]
+        return samples[0:samples.shape[0]-max_sample_shift]
 
     def sum_channels(self,samples):
         summed=np.zeros(samples.shape[0])
@@ -97,7 +96,7 @@ def get_data(filename,channel,length):
                 break
             i+=1
 
-            if(i%2!=channel):
+            if(i%2==channel):
                 continue
             data[j]=int(line.strip())
             j+=1
@@ -117,47 +116,47 @@ elevation=60
 beam=Beamformer(n_channels=16,coord=spacing,sample_rate=48000*64)
 samplerate=48000*64
 duration=2
-subduration=0.75
+subduration=0.8
 data= np.zeros((16,int(samplerate*(subduration))))
 
 
 length=int(samplerate*duration)
-data[0]=(get_data("./Acoustics/PDMTests/53/output_bit_1.txt",0,length))[0:int(48000*64*subduration)]
+data[0]=(get_data("./Acoustics/PDMTests/55/output_bit_1.txt",0,length))[0:int(48000*64*subduration)]
 print("Stream 1 Complete")
-data[1]=get_data("./Acoustics/PDMTests/53/output_bit_1.txt",1,length)[0:int(48000*64*subduration)]
+data[1]=get_data("./Acoustics/PDMTests/55/output_bit_1.txt",1,length)[0:int(48000*64*subduration)]
 print("Stream 2 Complete")
-data[2]=get_data("./Acoustics/PDMTests/53/output_bit_2.txt",0,length)[0:int(48000*64*subduration)]
+data[2]=get_data("./Acoustics/PDMTests/55/output_bit_2.txt",0,length)[0:int(48000*64*subduration)]
 print("Stream 3 Complete")
-data[3]=get_data("./Acoustics/PDMTests/53/output_bit_2.txt",1,length)[0:int(48000*64*subduration)]
+data[3]=get_data("./Acoustics/PDMTests/55/output_bit_2.txt",1,length)[0:int(48000*64*subduration)]
 print("Stream 4 Complete")
-data[4]=get_data("./Acoustics/PDMTests/53/output_bit_3.txt",0,length)[0:int(48000*64*subduration)]
+data[4]=get_data("./Acoustics/PDMTests/55/output_bit_3.txt",0,length)[0:int(48000*64*subduration)]
 print("Stream 5 Complete")
-data[5]=get_data("./Acoustics/PDMTests/53/output_bit_3.txt",1,length)[0:int(48000*64*subduration)]
+data[5]=get_data("./Acoustics/PDMTests/55/output_bit_3.txt",1,length)[0:int(48000*64*subduration)]
 print("Stream 6 Complete")
-data[6]=get_data("./Acoustics/PDMTests/53/output_bit_4.txt",0,length)[0:int(48000*64*subduration)]
+data[6]=get_data("./Acoustics/PDMTests/55/output_bit_4.txt",0,length)[0:int(48000*64*subduration)]
 print("Stream 7 Complete")
-data[7]=get_data("./Acoustics/PDMTests/53/output_bit_4.txt",1,length)[0:int(48000*64*subduration)]
+data[7]=get_data("./Acoustics/PDMTests/55/output_bit_4.txt",1,length)[0:int(48000*64*subduration)]
 print("Stream 8 Complete")
-data[8]=get_data("./Acoustics/PDMTests/53/output_bit_8.txt",0,length)[0:int(48000*64*subduration)]
+data[8]=get_data("./Acoustics/PDMTests/55/output_bit_8.txt",0,length)[0:int(48000*64*subduration)]
 print("Stream 9 Complete")
-data[9]=get_data("./Acoustics/PDMTests/53/output_bit_8.txt",1,length)[0:int(48000*64*subduration)]
+data[9]=get_data("./Acoustics/PDMTests/55/output_bit_8.txt",1,length)[0:int(48000*64*subduration)]
 print("Stream 10 Complete")
-data[10]=get_data("./Acoustics/PDMTests/53/output_bit_9.txt",0,length)[0:int(48000*64*subduration)]
+data[10]=get_data("./Acoustics/PDMTests/55/output_bit_9.txt",0,length)[0:int(48000*64*subduration)]
 print("Stream 11 Complete")
-data[11]=get_data("./Acoustics/PDMTests/53/output_bit_9.txt",1,length)[0:int(48000*64*subduration)]
+data[11]=get_data("./Acoustics/PDMTests/55/output_bit_9.txt",1,length)[0:int(48000*64*subduration)]
 print("Stream 12 Complete")
-data[12]=get_data("./Acoustics/PDMTests/53/output_bit_10.txt",0,length)[0:int(48000*64*subduration)]
+data[12]=get_data("./Acoustics/PDMTests/55/output_bit_10.txt",0,length)[0:int(48000*64*subduration)]
 print("Stream 13 Complete")
-data[13]=get_data("./Acoustics/PDMTests/53/output_bit_10.txt",1,length)[0:int(48000*64*subduration)]
+data[13]=get_data("./Acoustics/PDMTests/55/output_bit_10.txt",1,length)[0:int(48000*64*subduration)]
 print("Stream 14 Complete")
-data[14]=get_data("./Acoustics/PDMTests/53/output_bit_11.txt",0,length)[0:int(48000*64*subduration)]
+data[14]=get_data("./Acoustics/PDMTests/55/output_bit_11.txt",0,length)[0:int(48000*64*subduration)]
 print("Stream 15 Complete")
-data[15]=get_data("./Acoustics/PDMTests/53/output_bit_11.txt",1,length)[0:int(48000*64*subduration)]
+data[15]=get_data("./Acoustics/PDMTests/55/output_bit_11.txt",1,length)[0:int(48000*64*subduration)]
 print("Stream 16 Complete")
 print("Data Collected")
 segments=7
-time_segs=np.ceil(subduration*10)
-rms_data=np.zeros((segments,segments,time_segs))
+time_segs=int(np.ceil(subduration*10))
+rms_data=np.zeros((segments,segments,int(time_segs)))
 azi=-90
 ele=-90
 
@@ -182,8 +181,16 @@ for i in range(segments):
         beam.update_delays(azi+(180/segments)/2,ele+(180/segments)/2)
         outdata=beam.beamform(data.T)
         outdatapcm=cic.cic(outdata)
-        rms_data[i][j]=np.mean(outdatapcm**2)
-
+        for k in range(time_segs-1):
+            
+            rms_data[i][j][k]=np.mean(outdatapcm[k*1*960:(k+1)*2*960]**2)
+        rms_data[i][j][time_segs-1]=np.mean(outdatapcm[(time_segs-1)*1*960:]**2)
+        # for k in range(time_segs-1):
+            
+        #     rms_data[i][j][k]=np.mean(outdatapcm**2)
+        # rms_data[i][j][time_segs-1]=np.mean(outdatapcm**2)
+        
+        
         ele+=180/segments
         print(rms_data)
     ele=-90
@@ -194,33 +201,49 @@ print(rms_data)
 import numpy as np
 import matplotlib.pyplot as plt
 
+import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib.animation as animation
 
-segments = rms_data.shape[0]
-azi_angles = np.linspace(-90, 90, segments)  # Azimuth angles
-ele_angles = np.linspace(-90, 90, segments)  # Elevation angles
-
-# Create a meshgrid for azimuth and elevation
+# Assuming rms_data has shape (azimuth, elevation, time)
+segments_azi = rms_data.shape[0]
+segments_ele = rms_data.shape[1]
+time_steps = rms_data.shape[2]
+azi_angles = np.linspace(-90, 90, segments_azi)  # Azimuth angles
+ele_angles = np.linspace(-90, 90, segments_ele)  # Elevation angles
 azi_grid, ele_grid = np.meshgrid(azi_angles, ele_angles)
 
-# Normalize RMS data for visualization
-rms_data_normalized = rms_data / np.max(rms_data)
 
-# Plot the heatmap
-plt.figure(figsize=(10, 7))
-plt.pcolormesh(azi_grid, ele_grid, rms_data_normalized, shading='auto', cmap='viridis')
-plt.colorbar(label="Normalized RMS Power")
-plt.xlabel("Azimuth (°)")
-plt.ylabel("Elevation (°)")
-plt.title("RMS Power Distribution (Azimuth-Elevation Plane)")
 
-# Highlight maximum RMS power point
-max_idx = np.unravel_index(np.argmax(rms_data), rms_data.shape)
-max_azi = azi_angles[max_idx[1]]
-max_ele = ele_angles[max_idx[0]]
-plt.scatter(max_azi, max_ele, color='red', label="Strongest RMS Power", zorder=5)
-plt.legend()
+# Normalize RMS data
+rms_data /= np.max(rms_data)
+
+# Create figure and axis
+fig, ax = plt.subplots(figsize=(10, 7))
+im = ax.pcolormesh(azi_grid, ele_grid, rms_data[:, :, 0], shading='auto', cmap='viridis', vmin=0, vmax=1)
+cbar = fig.colorbar(im, ax=ax, label="Normalized RMS Power")
+
+# Scatter point for max RMS power (initialize, update later)
+max_point, = ax.plot([], [], 'ro', markersize=8, label="Strongest RMS Power")
+ax.legend()
+
+def update(frame):
+    im.set_array(rms_data[:, :, frame].ravel())  # Update heatmap data
+
+    # Find and update maximum power point
+    max_idx = np.unravel_index(np.argmax(rms_data[:, :, frame]), rms_data[:, :, frame].shape)
+    max_azi = azi_angles[max_idx[1]]  # Fixing indexing order
+    max_ele = ele_angles[max_idx[0]]
+    max_point.set_data([max_azi], [max_ele])  # Wrap values in lists
+
+    ax.set_title(f"RMS Power Distribution (Time Step {frame})")
+
+# Create animation
+ani = animation.FuncAnimation(fig, update, frames=time_steps, interval=200, repeat=True)
 
 plt.show()
+
+
 
 # interpolator=Preprocessor(mirrored=False,interpolate=int(np.ceil(target_samplerate/16000)))
 # print(speech.shape)
@@ -264,7 +287,7 @@ plt.show()
 #     ele=-90
 #     azi+=180/segments
 # print(rms_data)
-# # rms_data=np.array([[37.09039681, 37.09039732, 37.09039732, 37.09039732], [26.2475326,  37.46160062, 64.05876732, 75.13930766], [37.09039713, 64.0587671,  99.82954105, 54.64336452], [45.31064137, 70.59155776, 54.64336426, 29.43501057]])
+# # rms_data=np.array([[37.09039681, 37.09039732, 37.09039732, 37.09039732], [26.2475326,  37.46160062, 64.05876732, 75.13930766], [37.09039713, 64.0587671,  99.82955105, 55.64336452], [45.31064137, 70.59155776, 55.64336426, 29.43501057]])
 
 # import numpy as np
 # import matplotlib.pyplot as plt

@@ -1,58 +1,47 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.animation as animation
 
-# Example RMS data (replace with your actual data)
-rms_data = [0.45686734, 0.31404594, 0.37565332, 0.33370884, 0.075857, 0.18200582,
- 0.41648925, 0.5312394,  0.52055039, 0.53118349, 0.43077909, 0.18486702,
- 0.07654179, 0.3377602,  0.37555849, 0.32219962]
-rms_data = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]
-# Number of segments and distances (you can adjust this)
-segments = len(rms_data)
-distances = 100  # Number of distance levels (bins) per segment
+# Parameters
+segments_azi = 30  # Number of azimuth segments
+segments_ele = 30  # Number of elevation segments
+time_steps = 50    # Number of time frames
 
-# Generate theta values for the polar plot
-theta = np.linspace(0, 2 * np.pi, segments + 1)  # Add one to close the circle
-rms_data_normalized = rms_data / np.max(rms_data)  # Normalize the RMS data
-rms_data_normalized = np.append(rms_data_normalized, rms_data_normalized[0])  # Close the circle
+azi_angles = np.linspace(-90, 90, segments_azi)  # Azimuth angles
+ele_angles = np.linspace(-90, 90, segments_ele)  # Elevation angles
+azi_grid, ele_grid = np.meshgrid(azi_angles, ele_angles)
 
-# Extend theta to form the bins
-theta_grid, radius_grid = np.meshgrid(theta, np.linspace(0, 1, distances))
+# Generate synthetic RMS data with a moving peak
+rms_data = np.zeros((segments_ele, segments_azi, time_steps))  # (elevation, azimuth, time)
+for t in range(time_steps):
+    peak_azi = -60 + 120 * (t / time_steps)  # Moves from -60° to 60° azimuth
+    peak_ele = -30 + 60 * np.sin(2 * np.pi * t / time_steps)  # Oscillates in elevation
+    rms_data[:, :, t] = np.exp(-((azi_grid - peak_azi) ** 2 + (ele_grid - peak_ele) ** 2) / (2 * 20 ** 2))
 
-# Initialize a matrix for RMS data corresponding to each distance bin
-rms_data_grid = np.tile(rms_data_normalized, (distances, 1))
-for i in range(segments):
-    for j in range(distances):
-        
-        rms_data_grid[j][i]=0
-# for i in range(segments):
-#     for j in range(segments):
-        
-#         rms_data_grid[int(rms_data_normalized[i]*distances)-1][j]=rms_data_normalized[i]
-for i in range(segments+1):
-        for j in range(int((1-np.sqrt(rms_data_normalized[i]))*(distances-1)),distances):
-            rms_data_grid[j][i]=rms_data_normalized[i]
-        for j in range(int((1-np.sqrt(rms_data_normalized[i]))*(distances-1))):
-            rms_data_grid[j][i]=rms_data_normalized[i]/(((np.sqrt(rms_data_normalized[i])))/((float(distances)-j)/distances))**2
-            # rms_data_grid[j][i]=rms_data_normalized[i]*((float(distances)-j)/distances)**2
+# Normalize RMS data
+rms_data /= np.max(rms_data)
 
+# Create figure and axis
+fig, ax = plt.subplots(figsize=(10, 7))
+im = ax.pcolormesh(azi_grid, ele_grid, rms_data[:, :, 0], shading='auto', cmap='viridis', vmin=0, vmax=1)
+cbar = fig.colorbar(im, ax=ax, label="Normalized RMS Power")
 
-# Create a filled polar heatmap
-fig, ax = plt.subplots(subplot_kw={'projection': 'polar'})
-heatmap = ax.pcolormesh(theta_grid, radius_grid, rms_data_grid, cmap='jet', shading='auto')
+# Scatter point for max RMS power (initialize, update later)
+max_point, = ax.plot([], [], 'ro', markersize=8, label="Strongest RMS Power")
+ax.legend()
 
-# Add a marker for the sound source
-angle = 60  # Example angle
-source_theta = np.deg2rad(angle)
-ax.plot(source_theta, 1, 'ro', label=f'Sound Source ({angle}°)', markersize=10)
+def update(frame):
+    im.set_array(rms_data[:, :, frame].ravel())  # Update heatmap data
 
-# Add a colorbar
-cbar = plt.colorbar(heatmap, ax=ax, orientation='vertical')
-cbar.set_label('Normalized RMS Power')
+    # Find and update maximum power point
+    max_idx = np.unravel_index(np.argmax(rms_data[:, :, frame]), rms_data[:, :, frame].shape)
+    max_azi = azi_angles[max_idx[1]]  # Fixing indexing order
+    max_ele = ele_angles[max_idx[0]]
+    max_point.set_data([max_azi], [max_ele])  # Wrap values in lists
 
-# Add labels, legend, and title
-ax.legend(loc='upper right', bbox_to_anchor=(1.2, 1.1))
-ax.set_title('Circular Heatmap of RMS Power')
-ax.grid(False)
-ax.set_yticklabels([])
+    ax.set_title(f"RMS Power Distribution (Time Step {frame})")
+
+# Create animation
+ani = animation.FuncAnimation(fig, update, frames=time_steps, interval=32, repeat=True)
 
 plt.show()

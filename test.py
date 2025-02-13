@@ -98,7 +98,7 @@ digital_buffer = list(map(lambda s: int(s) << digital_ch, signal))  # generate s
 
 # digital_data = dig.getSamples(acquisition_buffer_size)
 
-chosen_bits = [1,2,3,4,8,9,10,11]    
+chosen_bits = [1,2,3,4,8,9,10,11,12]    
 # data = dig.getSamples(int(2 * 3072000*2))
 print("Data Collection Started")
 data = dig.getSamples(int(2 * 3072000*2))
