@@ -26,10 +26,16 @@ class Beamformer:
         sample_save=samples
         outdata= np.zeros((self.n_channels))
         for i in range(self.n_channels):
-            outdata[i]=np.mean(data[i][0:2048])
+            outdata[i]=np.mean(samples[i][0:2048])
             if(outdata[i]>=0.002):
                 samples.T[i]=0
-        if(outdata[0]<=0.002):
+        # for i in range(self.n_channels-1):
+        #     outdata[i]=np.mean(data[i][0:2048])
+        #     if(outdata[i]>outdata[i+1]):
+        #         samples.T[i]=0
+        #     else:
+        #         samples.T[i]=0
+        if(outdata[0]<=outdata[1]):
             samples=np.roll(samples.T,1).T
         # print(samples)
         # shifts=(self.calculate_channel_shift()).astype(int)
@@ -55,6 +61,8 @@ class Beamformer:
 
     def sum_channels(self,samples):
         summed=np.zeros(samples.shape[0])
+        # for j in range(samples.shape[1]):
+        #     summed+=samples.T[j]
         for j in range(samples.shape[0]):
             summed[j] = samples[j].sum()
         return summed
@@ -109,150 +117,150 @@ def get_data(filename,channel,length):
             data[j]=int(line.strip())
             j+=1
     return data
-# spacing=np.array([[-0.1,-0.1,0],[-0.1,0.0,0],[-0.1,0.1,0],[0,-0.1,0],[0,0,0],[0,0.1,0],[0.1,-0.1,0],[0.1,0,0],[0.1,0.1,0]])
-# spacing=np.array([[-0.2,-0.2,0],[-0.2,-0.1,0],[-0.2,0.1,0],[-0.2,0.2,0],[-0.1,-0.2,0],[-0.1,-0.1,0],[-0.1,0.1,0],[-0.1,0.2,0],[0.1,-0.2,0],[0.1,-0.1,0],[0.1,0.1,0],[0.1,0.2,0],[0.2,-0.2,0],[0.2,-0.1,0],[0.2,0.1,0],[0.2,0.2,0]])
-# spacing=np.array([[-0.18,0.12,0],[-0.06,0.12,0],[0.06,0.12,0],[0.18,0.12,0],[-0.18,0,0],[-0.06,0,0],[0.06,0,0],[0.18,0,0],[-0.18,-0.12,0],[-0.06,-0.12,0],[0.06,-0.12,0],[0.18,-0.12,0]])
-# spacing=np.array([[-0.08,0.042],[-0.08,0.014],[-0.08,-0.028],[-0.08,-0.042],[0.08,0.042],[0.08,0.014],[0.08,-0.028],[0.08,-0.042]])
-# spacing=np.array([[0,0],[0.028,0],[0.056,0],[0.084,0],[0.112,0],[0.14,0],[0.168,0],[0.196,0]])
-spacing=np.array([[-0.06,-0.24,0],[-0.18,-0.24,0],[-0.06,-0.12,0],[-0.18,-0.12,0],[-0.06,0,0],[-0.18,0,0],[-0.06,0.12,0],[-0.18,0.12,0],[0.18,-0.24,0],[0.06,-0.24,0],[0.18,-0.12,0],[0.06,-0.12,0],[0.18,0,0],[0.06,0,0],[0.18,0.12,0],[0.06,0.12,0]])
+# # spacing=np.array([[-0.1,-0.1,0],[-0.1,0.0,0],[-0.1,0.1,0],[0,-0.1,0],[0,0,0],[0,0.1,0],[0.1,-0.1,0],[0.1,0,0],[0.1,0.1,0]])
+# # spacing=np.array([[-0.2,-0.2,0],[-0.2,-0.1,0],[-0.2,0.1,0],[-0.2,0.2,0],[-0.1,-0.2,0],[-0.1,-0.1,0],[-0.1,0.1,0],[-0.1,0.2,0],[0.1,-0.2,0],[0.1,-0.1,0],[0.1,0.1,0],[0.1,0.2,0],[0.2,-0.2,0],[0.2,-0.1,0],[0.2,0.1,0],[0.2,0.2,0]])
+# # spacing=np.array([[-0.18,0.12,0],[-0.06,0.12,0],[0.06,0.12,0],[0.18,0.12,0],[-0.18,0,0],[-0.06,0,0],[0.06,0,0],[0.18,0,0],[-0.18,-0.12,0],[-0.06,-0.12,0],[0.06,-0.12,0],[0.18,-0.12,0]])
+# # spacing=np.array([[-0.08,0.042],[-0.08,0.014],[-0.08,-0.028],[-0.08,-0.042],[0.08,0.042],[0.08,0.014],[0.08,-0.028],[0.08,-0.042]])
+# # spacing=np.array([[0,0],[0.028,0],[0.056,0],[0.084,0],[0.112,0],[0.14,0],[0.168,0],[0.196,0]])
+# spacing=np.array([[-0.06,-0.24,0],[-0.18,-0.24,0],[-0.06,-0.12,0],[-0.18,-0.12,0],[-0.06,0,0],[-0.18,0,0],[-0.06,0.12,0],[-0.18,0.12,0],[0.18,-0.24,0],[0.06,-0.24,0],[0.18,-0.12,0],[0.06,-0.12,0],[0.18,0,0],[0.06,0,0],[0.18,0.12,0],[0.06,0.12,0]])
 
-import CICFilter as cic
+# import CICFilter as cic
 
-# sig=Sine(1500,0.5,48000)
-azimuth=60
-elevation=60
-beam=Beamformer(n_channels=16,coord=spacing,sample_rate=48000*64)
-samplerate=48000*64
-duration=2
-subduration=2
-data= np.zeros((16,int(samplerate*(subduration))))
+# # sig=Sine(1500,0.5,48000)
+# azimuth=60
+# elevation=60
+# beam=Beamformer(n_channels=16,coord=spacing,sample_rate=48000*64)
+# samplerate=48000*64
+# duration=2
+# subduration=1
+# data= np.zeros((16,int(samplerate*(subduration))))
 
 
-length=int(samplerate*duration)
-data[0]=(get_data("./Acoustics/PDMTests/55/output_bit_1.txt",0,length))[0:int(48000*64*subduration)]
-print("Stream 1 Complete")
-data[1]=get_data("./Acoustics/PDMTests/55/output_bit_1.txt",1,length)[0:int(48000*64*subduration)]
-print("Stream 2 Complete")
-data[2]=get_data("./Acoustics/PDMTests/55/output_bit_2.txt",0,length)[0:int(48000*64*subduration)]
-print("Stream 3 Complete")
-data[3]=get_data("./Acoustics/PDMTests/55/output_bit_2.txt",1,length)[0:int(48000*64*subduration)]
-print("Stream 4 Complete")
-data[4]=get_data("./Acoustics/PDMTests/55/output_bit_3.txt",0,length)[0:int(48000*64*subduration)]
-print("Stream 5 Complete")
-data[5]=get_data("./Acoustics/PDMTests/55/output_bit_3.txt",1,length)[0:int(48000*64*subduration)]
-print("Stream 6 Complete")
-data[6]=get_data("./Acoustics/PDMTests/55/output_bit_4.txt",0,length)[0:int(48000*64*subduration)]
-print("Stream 7 Complete")
-data[7]=get_data("./Acoustics/PDMTests/55/output_bit_4.txt",1,length)[0:int(48000*64*subduration)]
-print("Stream 8 Complete")
-data[8]=get_data("./Acoustics/PDMTests/55/output_bit_8.txt",0,length)[0:int(48000*64*subduration)]
-print("Stream 9 Complete")
-data[9]=get_data("./Acoustics/PDMTests/55/output_bit_8.txt",1,length)[0:int(48000*64*subduration)]
-print("Stream 10 Complete")
-data[10]=get_data("./Acoustics/PDMTests/55/output_bit_9.txt",0,length)[0:int(48000*64*subduration)]
-print("Stream 11 Complete")
-data[11]=get_data("./Acoustics/PDMTests/55/output_bit_9.txt",1,length)[0:int(48000*64*subduration)]
-print("Stream 12 Complete")
-data[12]=get_data("./Acoustics/PDMTests/55/output_bit_10.txt",0,length)[0:int(48000*64*subduration)]
-print("Stream 13 Complete")
-data[13]=get_data("./Acoustics/PDMTests/55/output_bit_10.txt",1,length)[0:int(48000*64*subduration)]
-print("Stream 14 Complete")
-data[14]=get_data("./Acoustics/PDMTests/55/output_bit_11.txt",0,length)[0:int(48000*64*subduration)]
-print("Stream 15 Complete")
-data[15]=get_data("./Acoustics/PDMTests/55/output_bit_11.txt",1,length)[0:int(48000*64*subduration)]
-print("Stream 16 Complete")
-print("Data Collected")
-segments=9
-time_segs=int(np.ceil(subduration*10))
-rms_data=np.zeros((segments,segments,int(time_segs)))
-azi=-90
-ele=-90
+# length=int(samplerate*duration)
+# data[0]=(get_data("./Acoustics/PDMTests/57/output_bit_1.txt",0,length))[0:int(48000*64*subduration)]
+# print("Stream 1 Complete")
+# data[1]=get_data("./Acoustics/PDMTests/57/output_bit_1.txt",1,length)[0:int(48000*64*subduration)]
+# print("Stream 2 Complete")
+# data[2]=get_data("./Acoustics/PDMTests/57/output_bit_2.txt",0,length)[0:int(48000*64*subduration)]
+# print("Stream 3 Complete")
+# data[3]=get_data("./Acoustics/PDMTests/57/output_bit_2.txt",1,length)[0:int(48000*64*subduration)]
+# print("Stream 4 Complete")
+# data[4]=get_data("./Acoustics/PDMTests/57/output_bit_3.txt",0,length)[0:int(48000*64*subduration)]
+# print("Stream 5 Complete")
+# data[5]=get_data("./Acoustics/PDMTests/57/output_bit_3.txt",1,length)[0:int(48000*64*subduration)]
+# print("Stream 6 Complete")
+# data[6]=get_data("./Acoustics/PDMTests/57/output_bit_4.txt",0,length)[0:int(48000*64*subduration)]
+# print("Stream 7 Complete")
+# data[7]=get_data("./Acoustics/PDMTests/57/output_bit_4.txt",1,length)[0:int(48000*64*subduration)]
+# print("Stream 8 Complete")
+# data[8]=get_data("./Acoustics/PDMTests/57/output_bit_8.txt",0,length)[0:int(48000*64*subduration)]
+# print("Stream 9 Complete")
+# data[9]=get_data("./Acoustics/PDMTests/57/output_bit_8.txt",1,length)[0:int(48000*64*subduration)]
+# print("Stream 10 Complete")
+# data[10]=get_data("./Acoustics/PDMTests/57/output_bit_9.txt",0,length)[0:int(48000*64*subduration)]
+# print("Stream 11 Complete")
+# data[11]=get_data("./Acoustics/PDMTests/57/output_bit_9.txt",1,length)[0:int(48000*64*subduration)]
+# print("Stream 12 Complete")
+# data[12]=get_data("./Acoustics/PDMTests/57/output_bit_10.txt",0,length)[0:int(48000*64*subduration)]
+# print("Stream 13 Complete")
+# data[13]=get_data("./Acoustics/PDMTests/57/output_bit_10.txt",1,length)[0:int(48000*64*subduration)]
+# print("Stream 14 Complete")
+# data[14]=get_data("./Acoustics/PDMTests/57/output_bit_11.txt",0,length)[0:int(48000*64*subduration)]
+# print("Stream 15 Complete")
+# data[15]=get_data("./Acoustics/PDMTests/57/output_bit_11.txt",1,length)[0:int(48000*64*subduration)]
+# print("Stream 16 Complete")
+# print("Data Collected")
+# segments=7
+# time_segs=int(np.ceil(subduration*10))
+# rms_data=np.zeros((segments,segments,int(time_segs)))
+# azi=-90
+# ele=-90
 
-import time
-# # beam.update_delays(30,0)
-# outdata=beam.beamform(data.T)
-# print(data.shape)
-# print("sfsgfdjkh")
-# print(outdata.shape)
-# outdatapcm=cic.cic(outdata)
-# print("fjkhsjkdfhjkhs")
-# print(outdatapcm.shape)
-# outdatapcm/=np.max(outdatapcm)
+# import time
+# # # beam.update_delays(30,0)
+# # outdata=beam.beamform(data.T)
+# # print(data.shape)
+# # print("sfsgfdjkh")
+# # print(outdata.shape)
+# # outdatapcm=cic.cic(outdata)
+# # print("fjkhsjkdfhjkhs")
+# # print(outdatapcm.shape)
+# # outdatapcm/=np.max(outdatapcm)
 
-# from scipy.io.wavfile import write,read
-# write("./Acoustics/PDMTests/1/beamformedchannel.wav", 48000,outdatapcm)
-for i in range(segments):
-    for j in range(segments):
+# # from scipy.io.wavfile import write,read
+# # write("./Acoustics/PDMTests/1/beamformedchannel.wav", 48000,outdatapcm)
+# for i in range(segments):
+#     for j in range(segments):
 
-        # io=IOStream()
-        # io.arrToStream(speech,48000)
-        print(i)
-        beam.update_delays(azi+(180/segments)/2,ele+(180/segments)/2)
-        outdata=beam.beamform(data.T)
-        outdatapcm=cic.cic(outdata)
-        for k in range(time_segs-1):
+#         # io=IOStream()
+#         # io.arrToStream(speech,48000)
+#         print(i)
+#         beam.update_delays(azi+(180/segments)/2,ele+(180/segments)/2)
+#         outdata=beam.beamform(data.T)
+#         outdatapcm=cic.cic(outdata)
+#         for k in range(time_segs-1):
             
-            rms_data[i][j][k]=np.mean(outdatapcm[k*1*960:(k+1)*2*960]**2)
-        rms_data[i][j][time_segs-1]=np.mean(outdatapcm[(time_segs-1)*1*960:]**2)
-        # for k in range(time_segs-1):
+#             rms_data[i][j][k]=np.mean(outdatapcm[k*1*960:(k+1)*1*960]**2)
+#         rms_data[i][j][time_segs-1]=np.mean(outdatapcm[(time_segs-1)*1*960:]**2)
+#         # for k in range(time_segs-1):
             
-        #     rms_data[i][j][k]=np.mean(outdatapcm**2)
-        # rms_data[i][j][time_segs-1]=np.mean(outdatapcm**2)
+#         #     rms_data[i][j][k]=np.mean(outdatapcm**2)
+#         # rms_data[i][j][time_segs-1]=np.mean(outdatapcm**2)
         
         
-        ele+=180/segments
-        print(rms_data)
-    ele=-90
-    azi+=180/segments
-print(rms_data)
-import os
-os.makedirs("./Acoustics/PDMTests/55/rms_frames"+str(segments)+"_"+str(subduration), exist_ok=True)
-np.save("./Acoustics/PDMTests/55/rms_data_"+str(segments)+"_"+str(subduration)+".npy", rms_data)
-import numpy as np
-import matplotlib.pyplot as plt
+#         ele+=180/segments
+#         print(rms_data)
+#     ele=-90
+#     azi+=180/segments
+# print(rms_data)
+# import os
+# os.makedirs("./Acoustics/PDMTests/57/rms_frames"+str(segments)+"_"+str(subduration), exist_ok=True)
+# np.save("./Acoustics/PDMTests/57/rms_data_"+str(segments)+"_"+str(subduration)+".npy", rms_data)
+# import numpy as np
+# import matplotlib.pyplot as plt
 
-import numpy as np
-import matplotlib.pyplot as plt
-import matplotlib.animation as animation
+# import numpy as np
+# import matplotlib.pyplot as plt
+# import matplotlib.animation as animation
 
-# Assuming rms_data has shape (azimuth, elevation, time)
-segments_azi = rms_data.shape[0]
-segments_ele = rms_data.shape[1]
-time_steps = rms_data.shape[2]
-azi_angles = np.linspace(-90, 90, segments_azi)  # Azimuth angles
-ele_angles = np.linspace(-90, 90, segments_ele)  # Elevation angles
-azi_grid, ele_grid = np.meshgrid(azi_angles, ele_angles)
+# # Assuming rms_data has shape (azimuth, elevation, time)
+# segments_azi = rms_data.shape[0]
+# segments_ele = rms_data.shape[1]
+# time_steps = rms_data.shape[2]
+# azi_angles = np.linspace(-90, 90, segments_azi)  # Azimuth angles
+# ele_angles = np.linspace(-90, 90, segments_ele)  # Elevation angles
+# azi_grid, ele_grid = np.meshgrid(azi_angles, ele_angles)
 
 
 
-# Normalize RMS data
-rms_data /= np.max(rms_data)
+# # Normalize RMS data
+# rms_data /= np.max(rms_data)
 
-# Create figure and axis
-fig, ax = plt.subplots(figsize=(10, 7))
-im = ax.pcolormesh(azi_grid, ele_grid, rms_data[:, :, 0], shading='auto', cmap='viridis', vmin=0, vmax=1)
-cbar = fig.colorbar(im, ax=ax, label="Normalized RMS Power")
+# # Create figure and axis
+# fig, ax = plt.subplots(figsize=(10, 7))
+# im = ax.pcolormesh(azi_grid, ele_grid, rms_data[:, :, 0], shading='auto', cmap='viridis', vmin=0, vmax=1)
+# cbar = fig.colorbar(im, ax=ax, label="Normalized RMS Power")
 
-# Scatter point for max RMS power (initialize, update later)
-max_point, = ax.plot([], [], 'ro', markersize=8, label="Strongest RMS Power")
-ax.legend()
+# # Scatter point for max RMS power (initialize, update later)
+# max_point, = ax.plot([], [], 'ro', markersize=8, label="Strongest RMS Power")
+# ax.legend()
 
-def update(frame):
-    im.set_array(rms_data[:, :, frame].ravel())  # Update heatmap data
+# def update(frame):
+#     im.set_array(rms_data[:, :, frame].ravel())  # Update heatmap data
 
-    # Find and update maximum power point
-    max_idx = np.unravel_index(np.argmax(rms_data[:, :, frame]), rms_data[:, :, frame].shape)
-    max_azi = azi_angles[max_idx[1]]  # Fixing indexing order
-    max_ele = ele_angles[max_idx[0]]
-    max_point.set_data([max_azi], [max_ele])  # Wrap values in lists
+#     # Find and update maximum power point
+#     max_idx = np.unravel_index(np.argmax(rms_data[:, :, frame]), rms_data[:, :, frame].shape)
+#     max_azi = azi_angles[max_idx[1]]  # Fixing indexing order
+#     max_ele = ele_angles[max_idx[0]]
+#     max_point.set_data([max_azi], [max_ele])  # Wrap values in lists
 
-    ax.set_title(f"RMS Power Distribution (Time Step {frame})")
-    plt.savefig(os.path.join("./Acoustics/PDMTests/55/rms_frames"+str(segments)+"_"+str(subduration), f"frame_{frame:03d}.png"))
+#     ax.set_title(f"RMS Power Distribution (Time Step {frame})")
+#     plt.savefig(os.path.join("./Acoustics/PDMTests/57/rms_frames"+str(segments)+"_"+str(subduration), f"frame_{frame:03d}.png"))
 
-# Create animation
-ani = animation.FuncAnimation(fig, update, frames=time_steps, interval=200, repeat=True)
-ani.save("./Acoustics/PDMTests/55/rms_animation"+str(segments)+"_"+str(subduration)+".gif", writer="Pillow", fps=10)
-plt.show()
+# # Create animation
+# ani = animation.FuncAnimation(fig, update, frames=time_steps, interval=100, repeat=True)
+# ani.save("./Acoustics/PDMTests/57/rms_animation"+str(segments)+"_"+str(subduration)+".gif", writer="Pillow", fps=10)
+# plt.show()
 
 
 
