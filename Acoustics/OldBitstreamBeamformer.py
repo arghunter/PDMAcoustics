@@ -49,6 +49,7 @@ class Beamformer:
         samples,max_sample_shift=self.delay_and_gain(samples)
 
         samples=self.sum_channels(samples)
+        print(samples)
         # if hasattr(self,'last_overlap'):
         #     for i in range(self.last_overlap.shape[0]):
         #         samples[i]+=self.last_overlap[i]
