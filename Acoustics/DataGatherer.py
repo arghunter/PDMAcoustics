@@ -58,4 +58,38 @@ def get_multi_channel_data(testNum,samplerate,duration,subduration):
     data[15]=get_data("./Acoustics/PDMTests/"+str(testNum)+"/output_bit_11.txt",1,length)[0:int(samplerate*subduration)]
     print("Stream 16 Complete")
     print("Data Collected")
+    data1= np.zeros((16,int(samplerate*(subduration))))
+    data1[0]=get_data("./Acoustics/PDMTests/63/output_bit_1.txt",0,length)[0:int(samplerate*subduration)]
+    print("Stream 1 Complete")
+    data1[1]=get_data("./Acoustics/PDMTests/63/output_bit_1.txt",1,length)[0:int(samplerate*subduration)]
+    print("Stream 2 Complete")
+    data1[2]=get_data("./Acoustics/PDMTests/63/output_bit_2.txt",0,length)[0:int(samplerate*subduration)]
+    print("Stream 3 Complete")
+    data1[3]=get_data("./Acoustics/PDMTests/63/output_bit_2.txt",1,length)[0:int(samplerate*subduration)]
+    print("Stream 4 Complete")
+    data1[4]=get_data("./Acoustics/PDMTests/63/output_bit_3.txt",0,length)[0:int(samplerate*subduration)]
+    print("Stream 5 Complete")
+    data1[5]=get_data("./Acoustics/PDMTests/63/output_bit_3.txt",1,length)[0:int(samplerate*subduration)]
+    print("Stream 6 Complete")
+    data1[6]=get_data("./Acoustics/PDMTests/63/output_bit_4.txt",0,length)[0:int(samplerate*subduration)]
+    print("Stream 7 Complete")
+    data1[7]=get_data("./Acoustics/PDMTests/63/output_bit_4.txt",1,length)[0:int(samplerate*subduration)]
+    print("Stream 8 Complete")
+    data1[8]=get_data("./Acoustics/PDMTests/63/output_bit_8.txt",0,length)[0:int(samplerate*subduration)]
+    print("Stream 9 Complete")
+    data1[9]=get_data("./Acoustics/PDMTests/63/output_bit_8.txt",1,length)[0:int(samplerate*subduration)]
+    print("Stream 10 Complete")
+    data1[10]=get_data("./Acoustics/PDMTests/63/output_bit_9.txt",0,length)[0:int(samplerate*subduration)]
+    print("Stream 11 Complete")
+    data1[11]=get_data("./Acoustics/PDMTests/63/output_bit_9.txt",1,length)[0:int(samplerate*subduration)]
+    print("Stream 12 Complete")
+    data1[12]=get_data("./Acoustics/PDMTests/63/output_bit_10.txt",0,length)[0:int(samplerate*subduration)]
+    print("Stream 13 Complete")
+    data1[13]=get_data("./Acoustics/PDMTests/63/output_bit_10.txt",1,length)[0:int(samplerate*subduration)]
+    print("Stream 14 Complete")
+    data1[14]=get_data("./Acoustics/PDMTests/63/output_bit_11.txt",0,length)[0:int(samplerate*subduration)]
+    print("Stream 15 Complete")
+    data1[15]=get_data("./Acoustics/PDMTests/63/output_bit_11.txt",1,length)[0:int(samplerate*subduration)]
+    for i in range(16):
+        data[i]+=-data1[i]
     return data
