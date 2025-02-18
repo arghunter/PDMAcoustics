@@ -16,12 +16,12 @@ def get_data(filename, channel, length):
                 break
             
             # Extract data for the specified channel
-            if i % 2 == channel:  # Select bits based on DDR format
+            # if i % 2 == channel:  # Select bits based on DDR format
                 
-                data[j] = int(line.strip())  # Convert line to int and store in data
-                if(data[j]==-1):
-                    data[j]=0
-                j += 1  # Increment output index
+            data[j] = int(line.strip())  # Convert line to int and store in data
+            if(data[j]==-1):
+                data[j]=0
+            j += 1  # Increment output index
             
             i += 1  # Increment bitdfasfasdfasdfadf index
 
@@ -37,38 +37,38 @@ data= np.zeros((16,int(samplerate*(duration))))
 
 # print(False==False)
 length=int(samplerate*duration)
-data[0]=get_data("./Acoustics/PDMTests/118/output_bit_1.txt",0,length)
+data[0]=get_data("./Acoustics/PDMTests/121/output_bit_1.txt",0,length)
 print("Stream 1 Complete")
 
-# data[1]=get_data("./Acoustics/PDMTests/118/output_bit_1.txt",1,length)
+# data[1]=get_data("./Acoustics/PDMTests/121/output_bit_1.txt",1,length)
 # print("Stream 2 Complete")
-data[2]=get_data("./Acoustics/PDMTests/118/output_bit_2.txt",0,length)
+data[2]=get_data("./Acoustics/PDMTests/121/output_bit_2.txt",0,length)
 print("Stream 3 Complete")
-# data[3]=get_data("./Acoustics/PDMTests/118/output_bit_2.txt",1,length)
+# data[3]=get_data("./Acoustics/PDMTests/121/output_bit_2.txt",1,length)
 # print("Stream 4 Complete")
-data[4]=get_data("./Acoustics/PDMTests/118/output_bit_3.txt",0,length)
+data[4]=get_data("./Acoustics/PDMTests/121/output_bit_3.txt",0,length)
 print("Stream 5 Complete")
-# data[5]=get_data("./Acoustics/PDMTests/118/output_bit_3.txt",1,length)
+# data[5]=get_data("./Acoustics/PDMTests/121/output_bit_3.txt",1,length)
 # print("Stream 6 Complete")
-data[6]=get_data("./Acoustics/PDMTests/118/output_bit_4.txt",0,length)
+data[6]=get_data("./Acoustics/PDMTests/121/output_bit_4.txt",0,length)
 print("Stream 7 Complete")
-# data[7]=get_data("./Acoustics/PDMTests/118/output_bit_4.txt",1,length)
+# data[7]=get_data("./Acoustics/PDMTests/121/output_bit_4.txt",1,length)
 # print("Stream 8 Complete")
-data[8]=get_data("./Acoustics/PDMTests/118/output_bit_8.txt",0,length)
+data[8]=get_data("./Acoustics/PDMTests/121/output_bit_8.txt",0,length)
 print("Stream 9 Complete")
-# data[9]=get_data("./Acoustics/PDMTests/118/output_bit_8.txt",1,length)
+# data[9]=get_data("./Acoustics/PDMTests/121/output_bit_8.txt",1,length)
 # print("Stream 10 Complete")
-data[10]=get_data("./Acoustics/PDMTests/118/output_bit_9.txt",0,length)
+data[10]=get_data("./Acoustics/PDMTests/121/output_bit_9.txt",0,length)
 print("Stream 11 Complete")
-# data[11]=get_data("./Acoustics/PDMTests/118/output_bit_9.txt",1,length)
+# data[11]=get_data("./Acoustics/PDMTests/121/output_bit_9.txt",1,length)
 # print("Stream 12 Complete")
-# data[12]=get_data("./Acoustics/PDMTests/118/output_bit_10.txt",0,length)
+# data[12]=get_data("./Acoustics/PDMTests/121/output_bit_10.txt",0,length)
 # print("Stream 13 Complete")
-# data[13]=get_data("./Acoustics/PDMTests/118/output_bit_10.txt",1,length)
+# data[13]=get_data("./Acoustics/PDMTests/121/output_bit_10.txt",1,length)
 # print("Stream 14 Complete")
-# data[14]=get_data("./Acoustics/PDMTests/118/output_bit_11.txt",0,length)
+# data[14]=get_data("./Acoustics/PDMTests/121/output_bit_11.txt",0,length)
 # print("Stream 15 Complete")
-# data[15]=get_data("./Acoustics/PDMTests/118/output_bit_11.txt",1,length)
+# data[15]=get_data("./Acoustics/PDMTests/121/output_bit_11.txt",1,length)
 # print("Stream 16 Complete")
 print("Data Collected")
 data1= np.zeros((16,int(samplerate*(duration))))
@@ -125,4 +125,4 @@ for i in range(1):
 print(np.max(outdata))
 outdata/=np.max(outdata)
 print(np.max(outdata))
-write("./Acoustics/PDMTests/118/channelbfr.wav", 48000,outdata.T)
+write("./Acoustics/PDMTests/121/channelbfr.wav", 48000,outdata.T)
