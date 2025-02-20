@@ -63,7 +63,7 @@ aout.reset()
 ctx.calibrateDAC()
 ctx.calibrateADC()
 import time
-time.sleep(3)
+time.sleep(1)
 # AnalogOut setup
 
 # aout.setCyclic(True)
