@@ -101,7 +101,7 @@ digital_buffer = list(map(lambda s: int(s) << digital_ch, signal))  # generate s
 chosen_bits = [1,2,3,4,8,9,10,11,12]    
 # data = dig.getSamples(int(2 * 3072000*2))
 print("Data Collection Started")
-data = dig.getSamples(int(2 * 3072000))
+data = dig.getSamples(int(2 * 3072000*2))
 print("Data Collection FInished")
 # Create a separate file for each bit
 file_handles = {bit: open(f"output_bit_{bit}.txt", "w") for bit in chosen_bits}
