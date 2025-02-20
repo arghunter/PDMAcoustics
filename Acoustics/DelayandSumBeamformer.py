@@ -133,12 +133,14 @@ segments=7
 rms_data=np.zeros((segments,segments))
 azi=-90
 ele=-90
+import time
 for i in range(segments):
     for j in range(segments):
         
         io=IOStream()
         io.arrToStream(speech,48000)
         print(i)
+        t1=time.time()
         beam.update_delays(azi+(180/segments)/2,ele+(180/segments)/2)
         while(not io.complete()):
             
@@ -147,7 +149,7 @@ for i in range(segments):
             outdata=beam.beamform(sample)
             rms_data[i][j]+=np.mean(outdata**2)
         ele+=180/segments
-        print(rms_data)
+        print(time.time()-t1)
     ele=-90
     azi+=180/segments
 print(rms_data)

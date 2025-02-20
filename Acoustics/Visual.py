@@ -46,7 +46,7 @@ def gen_anim(rms_data,segments,subduration,testNum, interpScale,fov):
         plt.savefig(os.path.join("./Acoustics/PDMTests/"+str(testNum)+"/rms_frames"+str(segments)+"_"+str(subduration), f"frame_{frame:03d}.png"))
 
     # Create animation
-    ani = animation.FuncAnimation(fig, update, frames=time_steps, interval=100/interpScale, repeat=True)
+    ani = animation.FuncAnimation(fig, update, frames=time_steps, interval=400/interpScale, repeat=True)
     ani.save("./Acoustics/PDMTests/"+str(testNum)+"/rms_animation"+str(segments)+"_"+str(subduration)+".gif", writer="Pillow", fps=10)
     plt.show()
     

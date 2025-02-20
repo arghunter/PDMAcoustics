@@ -21,15 +21,17 @@ data=DataGatherer.get_multi_channel_data(testNum,samplerate,duration,subduration
 
 azi=-fov/2
 ele=-fov/2
-
+import time
 for i in range(segments):
     for j in range(segments):
 
 
         print(i)
+        t1=time.time()
         beam.update_delays(azi+(fov/segments)/2,ele+(fov/segments)/2)
         outdata=beam.beamform(data.T)
         outdatapcm=cic.cic(outdata)
+        print(time.time()-t1)
         for k in range(time_segs-1):
             
             rms_data[i][j][k]=np.mean(outdatapcm[k*sample_count:(k+1)*sample_count]**2)
