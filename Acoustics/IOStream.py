@@ -5,7 +5,7 @@ import sounddevice as sd
 # from AudioWriter import AudioWriter
 #wav to arr as j Samples,Channels
 class IOStream: #sample duration in microseconds
-    def __init__(self,frame_len=20000,frame_shift=10000):
+    def __init__(self,frame_len=200000,frame_shift=100000):
         self.frame_len=frame_len
         self.frame_shift=frame_shift
         self.q=Queue()

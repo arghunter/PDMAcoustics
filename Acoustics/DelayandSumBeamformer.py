@@ -97,6 +97,7 @@ import soundfile as sf
 # spacing=np.array([[-0.2,-0.2,0],[-0.2,-0.1,0],[-0.2,0.1,0],[-0.2,0.2,0],[-0.1,-0.2,0],[-0.1,-0.1,0],[-0.1,0.1,0],[-0.1,0.2,0],[0.1,-0.2,0],[0.1,-0.1,0],[0.1,0.1,0],[0.1,0.2,0],[0.2,-0.2,0],[0.2,-0.1,0],[0.2,0.1,0],[0.2,0.2,0]])
 # spacing=np.array([[-0.18,0.12,0],[-0.06,0.12,0],[0.06,0.12,0],[0.18,0.12,0],[-0.18,0,0],[-0.06,0,0],[0.06,0,0],[0.18,0,0],[-0.18,-0.12,0],[-0.06,-0.12,0],[0.06,-0.12,0],[0.18,-0.12,0]])
 # spacing=np.array([[-0.06,-0.12,0],[-0.18,-0.12,0],[-0.06,0,0],[-0.18,0,0],[-0.06,0.12,0],[-0.18,0.12,0],[0.18,-0.12,0],[0.06,-0.12,0],[0.18,0,0],[0.06,0,0],[0.18,0.12,0],[0.06,0.12,0]])
+# spacing=np.array([[-0.06,-0.24,0],[-0.18,-0.24,0],[-0.06,-0.12,0],[-0.18,-0.12,0],[-0.06,0,0],[-0.18,0,0],[-0.06,0.12,0],[-0.18,0.12,0],[0.18,-0.24,0],[0.06,-0.24,0],[0.18,-0.12,0],[0.06,-0.12,0],[0.18,0,0],[0.06,0,0],[0.18,0.12,0],[0.06,0.12,0]])
 spacing=np.array([[-0.06,-0.24,0],[-0.18,-0.24,0],[-0.06,-0.12,0],[-0.18,-0.12,0],[-0.06,0,0],[-0.18,0,0],[-0.06,0.12,0],[-0.18,0.12,0],[0.18,-0.24,0],[0.06,-0.24,0],[0.18,-0.12,0],[0.06,-0.12,0],[0.18,0,0],[0.06,0,0],[0.18,0.12,0],[0.06,0.12,0]])
 
 # sig=Sine(1500,0.5,48000)
@@ -106,8 +107,23 @@ pe=Preprocessor(interpolate=3)
 target_samplerate=48000
 sig_gen=SignalGen(16,spacing)
 # speech,samplerate=sf.read(("C:/Users/arg/Documents/GitHub/EyeHear/Acoustics/AudioTests/test8.wav"))
-speech,samplerate=sf.read(("C:/Users/arg/Documents/GitHub/PDMAcoustics/Acoustics/PDMTests/22/channel.wav"))
+speech,samplerate=sf.read(("C:/Users/arg/Documents/GitHub/PDMAcoustics/Acoustics/PDMTests/186/data.wav"))
+speech_swapped = speech.copy()
+cutoff_freq = 500  # Cutoff frequency in Hz
+order = 4  # Filter order
 
+# Normalize the cutoff frequency
+nyquist = 0.5 * samplerate
+normal_cutoff = cutoff_freq / nyquist
+
+# Design the high-pass filter
+b, a = signal.butter(order, normal_cutoff, btype='high', analog=False)
+
+# Apply the filter
+speech_swapped = signal.filtfilt(b, a, speech, axis=0)
+# speech_swapped[:, ::2], speech_swapped[:, 1::2] = speech[:, 1::2], speech[:, ::2]
+# from scipy.io.wavfile import write,read
+# write("./Acoustics/PDMTests/181/channelk.wav", 48000,speech_swapped)
 # interpolator=Preprocessor(mirrored=False,interpolate=int(np.ceil(target_samplerate/16000)))
 # print(speech.shape)
 # speech=np.reshape(speech,(-1,1))
@@ -129,25 +145,28 @@ speech,samplerate=sf.read(("C:/Users/arg/Documents/GitHub/PDMAcoustics/Acoustics
 
 # spacing=np.array([[-0.1,-0.1,0],[-0.1,0.0,0],[-0.1,0.1,0],[0,-0.1,0],[0,0,0],[0,0.1,0],[0.1,-0.1,0],[0.1,0,0],[0.1,0.1,0]])
 beam=Beamformer(n_channels=16,coord=spacing)
-segments=7
-rms_data=np.zeros((segments,segments))
+segments=17
+rms_data=np.zeros((segments,segments,20))
 azi=-90
 ele=-90
 import time
+
 for i in range(segments):
     for j in range(segments):
         
         io=IOStream()
-        io.arrToStream(speech,48000)
+        io.arrToStream(speech_swapped,48000)
         print(i)
         t1=time.time()
         beam.update_delays(azi+(180/segments)/2,ele+(180/segments)/2)
+        k=0
         while(not io.complete()):
             
             sample=io.getNextSample()
-            sample[np.abs(sample) < (0.00063)] = 0
+            # sample[np.abs(sample) < (0.00063)] = 0
             outdata=beam.beamform(sample)
-            rms_data[i][j]+=np.mean(outdata**2)
+            rms_data[j][i][k]+=np.mean(outdata**2)
+            k+=1
         ele+=180/segments
         print(time.time()-t1)
     ele=-90
@@ -158,33 +177,36 @@ print(rms_data)
 import numpy as np
 import matplotlib.pyplot as plt
 
+# rms_data=np.flip(rms_data.T,axis=0)
+# print(rms_data)
+import Visual
+Visual.gen_anim(rms_data,segments,2,187,4,180)
+# segments = rms_data.shape[0]
+# azi_angles = np.linspace(-90, 90, segments)  # Azimuth angles
+# ele_angles = np.linspace(-90, 90, segments)  # Elevation angles
 
-segments = rms_data.shape[0]
-azi_angles = np.linspace(-90, 90, segments)  # Azimuth angles
-ele_angles = np.linspace(-90, 90, segments)  # Elevation angles
+# # Create a meshgrid for azimuth and elevation
+# azi_grid, ele_grid = np.meshgrid(azi_angles, ele_angles)
 
-# Create a meshgrid for azimuth and elevation
-azi_grid, ele_grid = np.meshgrid(azi_angles, ele_angles)
+# # Normalize RMS data for visualization
+# rms_data_normalized = rms_data / np.max(rms_data)
 
-# Normalize RMS data for visualization
-rms_data_normalized = rms_data / np.max(rms_data)
+# # Plot the heatmap
+# plt.figure(figsize=(10, 7))
+# plt.pcolormesh(azi_grid, ele_grid, rms_data_normalized, shading='auto', cmap='viridis')
+# plt.colorbar(label="Normalized RMS Power")
+# plt.xlabel("Azimuth (°)")
+# plt.ylabel("Elevation (°)")
+# plt.title("RMS Power Distribution (Azimuth-Elevation Plane)")
 
-# Plot the heatmap
-plt.figure(figsize=(10, 7))
-plt.pcolormesh(azi_grid, ele_grid, rms_data_normalized, shading='auto', cmap='viridis')
-plt.colorbar(label="Normalized RMS Power")
-plt.xlabel("Azimuth (°)")
-plt.ylabel("Elevation (°)")
-plt.title("RMS Power Distribution (Azimuth-Elevation Plane)")
+# # Highlight maximum RMS power point
+# max_idx = np.unravel_index(np.argmax(rms_data), rms_data.shape)
+# max_azi = azi_angles[max_idx[1]]
+# max_ele = ele_angles[max_idx[0]]
+# plt.scatter(max_azi, max_ele, color='red', label="Strongest RMS Power", zorder=5)
+# plt.legend()
 
-# Highlight maximum RMS power point
-max_idx = np.unravel_index(np.argmax(rms_data), rms_data.shape)
-max_azi = azi_angles[max_idx[1]]
-max_ele = ele_angles[max_idx[0]]
-plt.scatter(max_azi, max_ele, color='red', label="Strongest RMS Power", zorder=5)
-plt.legend()
-
-plt.show()
+# plt.show()
 
 
 
