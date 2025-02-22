@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.io.wavfile import write,read
 import soundfile as sf
-filename="./Acoustics/PDMTests/27/output_bit_8.txt"
+filename="./Acoustics/PDMTests/184/output_bit_1.txt"
 import matplotlib
 # matplotlib.use("Qt5Agg")
 def binary_to_decimal(binary_str):
@@ -81,6 +81,8 @@ counter=1
 out_array=[]
 in_array=[]
 count2=0
+count3=0
+tstore=0
 i=-1
 with open(filename, 'r') as file:
     line="  "
@@ -90,10 +92,17 @@ with open(filename, 'r') as file:
         if(line==""):
             break
         i+=1
+        
         if(i%2==1):
             continue
         count2+=1
-        int1=twos_complement_addition(int1,decimal_to_binary(int(line.strip())))
+        if (count3<32):
+            tstore+=int(line.strip())
+            count3+=1
+        else:
+            int1=twos_complement_addition(int1,decimal_to_binary(tstore+int(line.strip())))
+            count3=0
+            tstore=0
         in_array.append(decimal_to_binary(int(line.strip())))
         int2=twos_complement_addition(int1,int2)
         int3=twos_complement_addition(int2,int3)
@@ -112,8 +121,8 @@ with open(filename, 'r') as file:
 nparr=np.array(out_array, dtype=float)
 print(max(nparr))
 nparr/=max(nparr)
-print(len(nparr))
-write("cictest10wav", 48000,nparr)
+print(np.sqrt(np.mean(nparr**2)))
+write("cictest1016bwav", 48000,nparr)
 plt.plot(nparr[0:2000])
 plt.show()
 # nparr=np.array(in_array, dtype=float)

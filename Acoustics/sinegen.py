@@ -3,11 +3,11 @@ import wave
 import struct
 
 # Parameters
-sample_rate = 48000  # Standard audio sample rate
-frequency = 5000  # Frequency of the sine wave (A4 note)
-duration_on = 0.01  # 10 ms
-duration_off = 0.02  # 20 ms
-total_duration = 2.0  # 1 second total duration
+sample_rate = 16000  # Standard audio sample rate
+frequency = 440.0  # Frequency of the sine wave (A4 note)
+duration_on = 3  # 10 ms
+duration_off = 3  # 20 ms
+total_duration = 6.0  # 1 second total duration
 
 # Generate wave and silence segments
 samples_on = int(sample_rate * duration_on)
@@ -20,19 +20,20 @@ silence = np.zeros(samples_off)
 
 # Create one full cycle of sine + silence
 segment = np.concatenate((sine_wave, silence))
-
+import soundfile as sf
 # Repeat the pattern for the total duration
-waveform = np.tile(segment, num_repeats)
+# waveform_mono,sample_rate = sf.read("C:\\Users\\arg\\Documents\\Datasets\\dev-clean.tar\\dev-clean\\LibriSpeech\\dev-clean\\3000\\15664\\3000-15664-0008.flac")
+# waveform_mono2,sample_rate2 = sf.read("C:\\Users\\arg\\Documents\\Datasets\\dev-clean.tar\\dev-clean\\LibriSpeech\\dev-clean\\3853\\163249\\3853-163249-0018.flac")
+waveform_mono = 0.5 * np.sin(2 * np.pi * 1500 * time)
+waveform_mono2= 0.5 * np.sin(2 * np.pi * 900 * time)
+min_length = min(len(waveform_mono), len(waveform_mono2))
+waveform_mono = waveform_mono[:min_length]
+waveform_mono2 = waveform_mono2[:min_length]
 
-# Convert to 16-bit PCM format
-waveform_int16 = np.int16(waveform * 32767)
+# Stack the two mono channels into a stereo waveform
+stereo_waveform = np.stack((waveform_mono, waveform_mono2), axis=-1)
 
-# Write to a WAV file
-output_file = "sine_wave_pattern.wav"
-with wave.open(output_file, "w") as wav_file:
-    wav_file.setnchannels(1)  # Mono
-    wav_file.setsampwidth(2)  # 16-bit PCM
-    wav_file.setframerate(sample_rate)
-    wav_file.writeframes(struct.pack("<" + "h" * len(waveform_int16), *waveform_int16))
+# Save as a stereo WAV file
+sf.write("output_stereo.wav", stereo_waveform, sample_rate)
 
-print(f"WAV file generated: {output_file}")
+print("Stereo WAV file created successfully!")
