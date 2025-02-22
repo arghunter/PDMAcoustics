@@ -35,38 +35,38 @@ lr_clk=np.zeros((int(samplerate*(duration))))
 
 # print(False==False)
 length=int(samplerate*duration)
-# data[0]=get_data("./Acoustics/PDMTests/188/output_bit_1.txt",0,length)
+# data[0]=get_data("./Acoustics/PDMTests/191/output_bit_1.txt",0,length)
 # print("Stream 1 Complete")
 
-# data[1]=get_data("./Acoustics/PDMTests/188/output_bit_1.txt",1,length)
+# data[1]=get_data("./Acoustics/PDMTests/191/output_bit_1.txt",1,length)
 # print("Stream 2 Complete")
-# data[2]=get_data("./Acoustics/PDMTests/188/output_bit_2.txt",0,length)
+# data[2]=get_data("./Acoustics/PDMTests/191/output_bit_2.txt",0,length)
 # print("Stream 3 Complete")
-# data[3]=get_data("./Acoustics/PDMTests/188/output_bit_2.txt",1,length)
+# data[3]=get_data("./Acoustics/PDMTests/191/output_bit_2.txt",1,length)
 # print("Stream 4 Complete")
-# data[4]=get_data("./Acoustics/PDMTests/188/output_bit_3.txt",0,length)
+# data[4]=get_data("./Acoustics/PDMTests/191/output_bit_3.txt",0,length)
 # print("Stream 5 Complete")
-# data[5]=get_data("./Acoustics/PDMTests/188/output_bit_3.txt",1,length)
+# data[5]=get_data("./Acoustics/PDMTests/191/output_bit_3.txt",1,length)
 # print("Stream 6 Complete")
-# data[6]=get_data("./Acoustics/PDMTests/188/output_bit_4.txt",0,length)
+# data[6]=get_data("./Acoustics/PDMTests/191/output_bit_4.txt",0,length)
 # print("Stream 7 Complete")
-# data[7]=get_data("./Acoustics/PDMTests/188/output_bit_4.txt",1,length)
+# data[7]=get_data("./Acoustics/PDMTests/191/output_bit_4.txt",1,length)
 # print("Stream 8 Complete")
-# data[8]=get_data("./Acoustics/PDMTests/188/output_bit_8.txt",0,length)
+# data[8]=get_data("./Acoustics/PDMTests/191/output_bit_8.txt",0,length)
 # print("Stream 9 Complete")
-# data[9]=get_data("./Acoustics/PDMTests/188/output_bit_8.txt",1,length)
+# data[9]=get_data("./Acoustics/PDMTests/191/output_bit_8.txt",1,length)
 # print("Stream 10 Complete")
-# data[10]=get_data("./Acoustics/PDMTests/188/output_bit_9.txt",0,length)
+# data[10]=get_data("./Acoustics/PDMTests/191/output_bit_9.txt",0,length)
 # print("Stream 11 Complete")
-# data[11]=get_data("./Acoustics/PDMTests/188/output_bit_9.txt",1,length)
+# data[11]=get_data("./Acoustics/PDMTests/191/output_bit_9.txt",1,length)
 # print("Stream 12 Complete")
-lr_clk=get_data("./Acoustics/PDMTests/188/output_bit_10.txt",length)
+lr_clk=get_data("./Acoustics/PDMTests/191/output_bit_10.txt",length)
 print("Stream 13 Complete")
-# data[13]=get_data("./Acoustics/PDMTests/188/output_bit_10.txt",1,length)
+# data[13]=get_data("./Acoustics/PDMTests/191/output_bit_10.txt",1,length)
 # print("Stream 14 Complete")
-i2s=get_data("./Acoustics/PDMTests/188/output_bit_11.txt",length)
+i2s=get_data("./Acoustics/PDMTests/191/output_bit_11.txt",length)
 print("Stream 15 Complete")
-cntr=get_data("./Acoustics/PDMTests/188/output_bit_12.txt",length)
+cntr=get_data("./Acoustics/PDMTests/191/output_bit_12.txt",length)
 print("Stream 16 Complete")
 print("Data Collected")
 
@@ -81,7 +81,7 @@ t1=time.time()
 
 
 bin_powers = 2**np.arange(31, -1, -1)  # Precompute powers of 2
-pdata= np.zeros((16,16,50))
+pdata= np.zeros((16,16,500))
 times=0
 init_val=-1
 p_cnt=-1
@@ -92,13 +92,14 @@ for i in range(1, len(lr_clk) - 34):
         if bin_val[0] == 1:
             bin_int -= sub_diff
         
-        
+        print(bin_int)
         outdata[k] = bin_int
         bin_val = cntr[i + 2 : i + 34]  # Extract binary values
         bin_int = np.dot(bin_val, bin_powers)
         if bin_val[0] == 1:
             bin_int -= sub_diff
         bin_int+=128
+        
         if bin_int==init_val and p_cnt!=bin_int:
             times+=1
         if(init_val==-1):
@@ -126,8 +127,8 @@ outdata/=np.max(outdata)
 # print(np.max(outdata))
 print(np.mean(pdata))
 print(np.max(pdata))
-write("./Acoustics/PDMTests/188/channelbfri2sr.wav", 48000,outdata.T)
+write("./Acoustics/PDMTests/191/channelbfri2sr.wav", 48000,outdata.T)
 import Visual
-Visual.gen_anim(pdata,16,2.188,188,1,120)
+Visual.gen_anim(pdata,16,2.191,191,1,120)
 
 
