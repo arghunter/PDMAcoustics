@@ -7,13 +7,15 @@ import matplotlib.animation as animation
 # Initialize serial connection
 ser = serial.Serial('COM5', 921600, timeout=1)
 
-past = np.zeros(4, dtype=int)  # Preamble buffer
+# Preamble buffer
 pt = 0
 times = 0
-pdata = np.zeros((16, 16, 60))  # Storage for frames
-segments=16
-interpScale=1
-fov=120
+pdata = np.zeros((16, 16, 600))  # Storage for frames
+segments = 16
+interpScale = 1
+fov = 120
+lock = threading.Lock()  # Lock to ensure thread safety
+
 # Matplotlib figure setup
 initial_data = np.zeros((segments, segments))  # Assuming square grid
 zoom_factors = (interpScale, interpScale)
@@ -43,6 +45,10 @@ ax.legend()
 def read_serial():
     """ Reads serial data and updates `pdata` in real-time """
     global times, pt
+    global pdata
+    ovals=np.zeros(300)
+
+    past = np.zeros(4, dtype=int)
     while True:
         byte = ser.read(1)
         if int.from_bytes(byte, byteorder="little") == 88:
@@ -56,13 +62,14 @@ def read_serial():
             value = int.from_bytes(byte_pair, byteorder='little')
             past = np.roll(past, 3)
             past[:3] = [byte_pair[0], byte_pair[1], byte_pair[2]]
-
+            oval=0
             # Detect preamble (88 88 88 88)
             if np.all(past == 88):
                 pt = 0  # Reset index
                 times += 1
-                print(f"Frame {times} received")
-
+                # print(f"Frame {times} received")
+                if(times == 600):
+                    times = 0
                 # Store data after preamble
                 while pt < 256:
                     byte_pair = ser.read(2)
@@ -70,13 +77,28 @@ def read_serial():
                         continue  # Ensure we read 2 bytes
                     
                     value = int.from_bytes(byte_pair, byteorder='little')
-                    pdata[int(pt / 16)][int(pt % 16)][times] = np.abs(value)
+                    
+                    # Use a lock to prevent race conditions
+                    with lock:
+                        pdata[int(pt / 16)][int(pt % 16)][times] = value
                     pt += 1
+                    
+                    oval=value
+            ovals=np.roll(ovals,1)
+            ovals[0]=value
+            print(np.mean(ovals))        
+                
 
 def update(_):
     """ Update function for animation """
+    global times
+    global pdata
+    # pdata[0][0][times-1]=0
+    # pdata[0][1][times-1]=300
     if times > 0:  # Ensure there's at least one frame
-        im.set_array(pdata[:, :, times - 1])  # Show latest frame
+        # Use a lock to access the latest data
+        with lock:
+            im.set_array(pdata[:-1, :-1, times - 1]/np.max(pdata))  # Show latest frame
     return im,
 
 # Start serial reading in a separate thread
