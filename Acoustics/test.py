@@ -1,65 +1,86 @@
+import os
 import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib.animation as animation
+from scipy.ndimage import zoom
+from queue import Queue
+import threading
+import time
 
-import numpy as np
-from scipy.io.wavfile import write,read
+# Global queue for real-time RMS data updates
+rms_queue = Queue()
 
-import numpy as np
+def enqueue_rms_data(rms_data):
+    """ Add new RMS data to the queue for real-time visualization """
+    rms_queue.put(rms_data)
 
-def get_data(filename, channel, length):
+def real_time_anim(segments, subduration, testNum, interpScale, fov):
+    os.makedirs(f"./Acoustics/PDMTests/{testNum}/rms_frames{segments}_{subduration}", exist_ok=True)
 
-    i = 0  # Track the bit index in the file
-    j = 0  # Track the index in the output data array
-    data = np.zeros((length,))
+    # Placeholder for first frame
+    initial_data = np.zeros((segments, segments))  # Assuming square grid
+    zoom_factors = (interpScale, interpScale)
+
+    # Interpolated grid dimensions
+    segments_azi, segments_ele = [int(dim * interpScale) for dim in initial_data.shape]
+    azi_angles = np.linspace(-int(fov / 2), int(fov / 2), segments_azi)
+    ele_angles = np.linspace(-int(fov / 2), int(fov / 2), segments_ele)
+    azi_grid, ele_grid = np.meshgrid(azi_angles, ele_angles)
+
+    # Ensure azi_grid and ele_grid match the expected shape for pcolormesh
+    azi_grid = azi_grid[:-1, :-1]  # Reduce by 1 in both dimensions
+    ele_grid = ele_grid[:-1, :-1]
+
+    # Create figure and axis
+    fig, ax = plt.subplots(figsize=(10, 7))
     
-    with open(filename, 'r') as file:
-        while j < length:  # Stop when the desired length is reached
-            line = file.readline()
-            if not line:  # End of file
-                break
-            
-            # Extract data for the specified channel
-            if i % 2 == channel:  # Select bits based on DDR format
-                
-                v=int(line.strip())  # Convert line to int and store in data
-                data[j]=v
-                # if(v==-1):
-                #     data[j]=0
-                # else:
-                #     data[j]=1
-                j += 1  # Increment output index
-            
-            i += 1  # Increment bit index
+    # Generate a properly shaped initial heatmap
+    initial_rms_data = np.zeros((segments_azi - 1, segments_ele - 1))
+    im = ax.pcolormesh(azi_grid, ele_grid, initial_rms_data, shading='auto', cmap='viridis', vmin=0, vmax=1)
+    cbar = fig.colorbar(im, ax=ax, label="Normalized RMS Power")
 
-    return data
+    # Scatter point for max RMS power
+    max_point, = ax.plot([], [], 'ro', markersize=8, label="Strongest RMS Power")
+    ax.legend()
 
+    def update(_):
+        """ Updates the plot with new RMS data from the queue. """
+        if not rms_queue.empty():
+            rms_data = rms_queue.get()
 
+            # Interpolate new data
+            rms_data_interp = zoom(rms_data, zoom_factors, order=1)
 
+            # Normalize (avoid division by zero)
+            if np.max(rms_data_interp) > 0:
+                rms_data_interp /= np.max(rms_data_interp)
 
-samplerate=48000*64
-duration=2
+            # Ensure the shape matches (reduce by 1 in both dimensions)
+            rms_data_interp = rms_data_interp[:-1, :-1]
 
-data= np.zeros((16,int(samplerate*(duration))))
+            # Update heatmap
+            im.set_array(rms_data_interp.ravel())
 
+            # Find and update maximum power point
+            max_idx = np.unravel_index(np.argmax(rms_data_interp), rms_data_interp.shape)
+            max_azi = azi_angles[max_idx[1]]
+            max_ele = ele_angles[max_idx[0]]
+            max_point.set_data([max_azi], [max_ele])
 
-# print(False==False)
-length=int(samplerate*duration)
-data[0]=get_data("./Acoustics/PDMTests/56/output_bit_1.txt",0,length)
+            ax.set_title(f"Real-Time RMS Power Distribution")
 
-print("Stream 1 Complete")
+        return im, max_point
 
+    ani = animation.FuncAnimation(fig, update, interval=200 / interpScale, blit=False)
+    plt.show()
 
-# length = 10  # Change to your actual length
-# data = np.random.randint(0, 2, (16, length), dtype=np.uint8)  # Binary data (0s and 1s)
-# d1=np.zeros((16,length),dtype=np.uint8)
-# d1r=np.random.randint(0, 2, (length), dtype=np.uint8)
-for i in range(16):
-    data[i] = np.roll(data[0],3000*i)
-# data=d1
-print(data)
-# Perform XOR across each row (channel)
-xor_results = np.zeros(length)
-for i in range(length):
-    xor_results[i]=(data[0][i]+data[1][i]+data[2][i]+data[3][i]+data[4][i]+data[5][i]+data[6][i]+data[7][i]+data[8][i]+data[9][i]+data[10][i]+data[11][i]+data[12][i]+data[13][i]+data[14][i]+data[15][i])**2
-    # xor_results[i]=(data[0][i]^data[1][i])
-print(xor_results)
-print(np.sum(xor_results))
+# Example usage (in a separate thread to simulate real-time updates)
+def simulate_real_time_data():
+    while True:
+        new_rms = np.random.rand(10, 10)  # Example: New 10x10 RMS power array
+        enqueue_rms_data(new_rms)
+        time.sleep(0.5)  # Simulate new data every 0.5s
+
+# Start real-time animation
+threading.Thread(target=simulate_real_time_data, daemon=True).start()
+real_time_anim(segments=10, subduration=5, testNum=1, interpScale=2, fov=60)
