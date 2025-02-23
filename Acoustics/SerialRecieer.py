@@ -14,6 +14,8 @@ while times<60:
     pt+=1
     if(pt<256):
         pdata[int(pt/16)][int(pt %16)][times]+=np.abs(past[0])
+        if(pdata[int(pt/16)][int(pt %16)][times]>5):
+            pdata[int(pt/16)][int(pt %16)][times]=2
     if np.all(past==88):
         pt=0
         times+=1
