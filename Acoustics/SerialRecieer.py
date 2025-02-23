@@ -5,10 +5,10 @@ import time
 
 ser = serial.Serial('COM5', 921600, timeout=1)
 
-past = np.zeros(4, dtype=int)  # Preamble buffer
+past = np.zeros(3, dtype=int)  # Preamble buffer
 pt = 0
 times = 0
-pdata = np.zeros((16, 16, 60), dtype=int)
+pdata = np.zeros((16, 16, 60))
 
 while times < 60:
     byte_pair = ser.read(2)  # Read 2 bytes at a time
@@ -30,6 +30,7 @@ while times < 60:
     if pt < 256:
         pdata[int(pt / 16)][int(pt % 16)][times] = np.abs(value)
         pt += 1
+        print(value)
 
 
 import Visual
