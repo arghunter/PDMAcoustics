@@ -88,15 +88,16 @@ def cic(arr):
 
 
         count2+=1
-        if (count3<32):
-            tstore+=int(line)
-            count3+=1
-        else:
-            int1=twos_complement_addition(int1,decimal_to_binary(tstore+int(line)))
-            count3=0
-            tstore=0
+        # if (count3<32):
+        #     tstore+=int(line)
+        #     count3+=1
+        # else:
+        #     int1=twos_complement_addition(int1,decimal_to_binary(tstore+int(line)))
+        #     count3=0
+        #     tstore=0
         # int1=twos_complement_addition(int1,decimal_to_binary(int(line)))
         in_array.append(decimal_to_binary(int(line)))
+        int1=twos_complement_addition(int1,decimal_to_binary(int(line)))
         int2=twos_complement_addition(int1,int2)
         int3=twos_complement_addition(int2,int3)
         if counter>=64:
