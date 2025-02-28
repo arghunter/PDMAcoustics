@@ -53,7 +53,10 @@ class SignalGen:
         return channel_shifts
     def update_delays(self,azimuth,elevation): #doa in degrees, assuming plane wave as it is a far-field source
         
-        self.delays=np.array(self.delay_approx.get_delays(DelayAproximator.get_pos(azimuth,elevation,20000)))*10**6
+        self.delays=np.array(self.delay_approx.get_flat_delays(azimuth,elevation))*10**6
+        print(self.delays)
+        shift=min(self.delays)
+        self.delays+=-shift
         # shift=min(self.delays)
         # self.delays+=-shift
         # print(self.delays)

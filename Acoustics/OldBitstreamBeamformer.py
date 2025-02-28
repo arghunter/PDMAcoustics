@@ -24,21 +24,21 @@ class Beamformer:
     def beamform(self,samples):
 
         sample_save=samples
-        # outdata= np.zeros((self.n_channels))
-        # for i in range(self.n_channels):
-        #     outdata[i]=np.mean(samples[i][0:2048])
-        #     if(outdata[i]>=0.002):
+        outdata= np.zeros((self.n_channels))
+        for i in range(self.n_channels):
+            outdata[i]=np.mean(samples[i][0:2048])
+            if(outdata[i]>=0.002):
+                samples.T[i]=0
+        # for i in range(self.n_channels-1):
+        #     outdata[i]=np.mean(data[i][0:2048])
+        #     if(outdata[i]>outdata[i+1]):
         #         samples.T[i]=0
-        # # for i in range(self.n_channels-1):
-        # #     outdata[i]=np.mean(data[i][0:2048])
-        # #     if(outdata[i]>outdata[i+1]):
-        # #         samples.T[i]=0
-        # #     else:
-        # #         samples.T[i]=0
-        # if(outdata[0]<=outdata[1]):
-        #     samples=np.roll(samples.T,1).T
-        # print(samples)
-        # shifts=(self.calculate_channel_shift()).astype(int)
+        #     else:
+        #         samples.T[i]=0
+        if(outdata[0]<=outdata[1]):
+            samples=np.roll(samples.T,1).T
+        print(samples)
+        shifts=(self.calculate_channel_shift()).astype(int)
 
         # max_sample_shift=int(max(shifts))
         # summed=np.zeros(samples.shape[0])

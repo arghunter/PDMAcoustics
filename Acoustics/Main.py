@@ -4,7 +4,7 @@ import DataGatherer
 from OldBitstreamBeamformer import Beamformer
 import Visual
 spacing=np.array([[-0.06,-0.24,0],[-0.18,-0.24,0],[-0.06,-0.12,0],[-0.18,-0.12,0],[-0.06,0,0],[-0.18,0,0],[-0.06,0.12,0],[-0.18,0.12,0],[0.18,-0.24,0],[0.06,-0.24,0],[0.18,-0.12,0],[0.06,-0.12,0],[0.18,0,0],[0.06,0,0],[0.18,0.12,0],[0.06,0.12,0]])
-testNum=56
+testNum=186
 n_channels=16
 samplerate=48000*64
 duration=2

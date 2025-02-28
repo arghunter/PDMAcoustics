@@ -150,3 +150,5 @@ ax.plot(xf[0:300], (2.0/N * np.abs(yf[:N//2]))[0:300])
 plt.show()
 # Display the plot
 plt.show()
+
+

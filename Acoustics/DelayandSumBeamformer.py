@@ -144,43 +144,43 @@ speech_swapped = signal.filtfilt(b, a, speech, axis=0)
 
 
 # spacing=np.array([[-0.1,-0.1,0],[-0.1,0.0,0],[-0.1,0.1,0],[0,-0.1,0],[0,0,0],[0,0.1,0],[0.1,-0.1,0],[0.1,0,0],[0.1,0.1,0]])
-beam=Beamformer(n_channels=16,coord=spacing)
-segments=17
-rms_data=np.zeros((segments,segments,20))
-azi=-90
-ele=-90
-import time
+# beam=Beamformer(n_channels=16,coord=spacing)
+# segments=17
+# rms_data=np.zeros((segments,segments,20))
+# azi=-90
+# ele=-90
+# import time
 
-for i in range(segments):
-    for j in range(segments):
+# for i in range(segments):
+#     for j in range(segments):
         
-        io=IOStream()
-        io.arrToStream(speech_swapped,48000)
-        print(i)
-        t1=time.time()
-        beam.update_delays(azi+(180/segments)/2,ele+(180/segments)/2)
-        k=0
-        while(not io.complete()):
+#         io=IOStream()
+#         io.arrToStream(speech_swapped,48000)
+#         print(i)
+#         t1=time.time()
+#         beam.update_delays(azi+(180/segments)/2,ele+(180/segments)/2)
+#         k=0
+#         while(not io.complete()):
             
-            sample=io.getNextSample()
-            # sample[np.abs(sample) < (0.00063)] = 0
-            outdata=beam.beamform(sample)
-            rms_data[j][i][k]+=np.mean(outdata**2)
-            k+=1
-        ele+=180/segments
-        print(time.time()-t1)
-    ele=-90
-    azi+=180/segments
-print(rms_data)
-# rms_data=np.array([[37.09039681, 37.09039732, 37.09039732, 37.09039732], [26.2475326,  37.46160062, 64.05876732, 75.13930766], [37.09039713, 64.0587671,  99.82954105, 54.64336452], [45.31064137, 70.59155776, 54.64336426, 29.43501057]])
-
-import numpy as np
-import matplotlib.pyplot as plt
-
-# rms_data=np.flip(rms_data.T,axis=0)
+#             sample=io.getNextSample()
+#             # sample[np.abs(sample) < (0.00063)] = 0
+#             outdata=beam.beamform(sample)
+#             rms_data[j][i][k]+=np.mean(outdata**2)
+#             k+=1
+#         ele+=180/segments
+#         print(time.time()-t1)
+#     ele=-90
+#     azi+=180/segments
 # print(rms_data)
-import Visual
-Visual.gen_anim(rms_data,segments,2,187,4,180)
+# # rms_data=np.array([[37.09039681, 37.09039732, 37.09039732, 37.09039732], [26.2475326,  37.46160062, 64.05876732, 75.13930766], [37.09039713, 64.0587671,  99.82954105, 54.64336452], [45.31064137, 70.59155776, 54.64336426, 29.43501057]])
+
+# import numpy as np
+# import matplotlib.pyplot as plt
+
+# # rms_data=np.flip(rms_data.T,axis=0)
+# # print(rms_data)
+# import Visual
+# Visual.gen_anim(rms_data,segments,2,187,4,180)
 # segments = rms_data.shape[0]
 # azi_angles = np.linspace(-90, 90, segments)  # Azimuth angles
 # ele_angles = np.linspace(-90, 90, segments)  # Elevation angles
