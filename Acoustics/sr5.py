@@ -213,7 +213,7 @@ def receive_and_process_uart_data(port, baudrate=9600, timeout=1, output_file=No
                         
                         word_counter += 1
                         
-                        # Print progress every 1000 words
+                        # Print progress and update visualization every 1000 words
                         if word_counter % 1000 == 0:
                             print(f"Processed {word_counter} words")
                             
@@ -265,29 +265,53 @@ def receive_and_process_uart_data(port, baudrate=9600, timeout=1, output_file=No
 
 
 def update_visualization(raw_pdata, final=False):
-    """Create a heatmap visualization of the latest values"""
+    """Create visualizations of the data including average energy heatmap"""
     try:
         import matplotlib.pyplot as plt
+        import matplotlib.gridspec as gridspec
         
-        # Create a heatmap of the latest values
+        # Create a figure with 2 subplots (side by side)
+        fig = plt.figure(figsize=(18, 8))
+        gs = gridspec.GridSpec(1, 2, width_ratios=[1, 1])
+        
+        # Calculate latest values
         latest_values = np.zeros((16, 16))
         for row in range(16):
             for col in range(16):
                 if len(raw_pdata[row][col]) > 0:
                     latest_values[row, col] = raw_pdata[row][col][-1]
         
-        plt.figure(figsize=(10, 8))
-        plt.imshow(latest_values, cmap='viridis')
-        plt.colorbar(label='Value')
-        plt.title('Latest 24-bit Values in 16x16 Grid')
-        plt.xlabel('Column')
-        plt.ylabel('Row')
+        # Calculate average energy (magnitude of values)
+        avg_energy = np.zeros((16, 16))
+        for row in range(16):
+            for col in range(16):
+                if len(raw_pdata[row][col]) > 0:
+                    # Calculate average of absolute values to represent energy
+                    avg_energy[row, col] = np.mean(np.abs(raw_pdata[row][col]))
+        
+        # First subplot: Latest values
+        ax1 = plt.subplot(gs[0])
+        im1 = ax1.imshow(latest_values, cmap='viridis')
+        plt.colorbar(im1, ax=ax1, label='Value')
+        ax1.set_title('Latest 24-bit Values')
+        ax1.set_xlabel('Column')
+        ax1.set_ylabel('Row')
+        
+        # Second subplot: Average energy
+        ax2 = plt.subplot(gs[1])
+        im2 = ax2.imshow(avg_energy, cmap='inferno')
+        plt.colorbar(im2, ax=ax2, label='Average Energy (magnitude)')
+        ax2.set_title('Average Signal Energy')
+        ax2.set_xlabel('Column')
+        ax2.set_ylabel('Row')
+        
+        plt.tight_layout()
         
         # Save the figure
         if final:
-            plt.savefig('final_heatmap.png')
+            plt.savefig('final_visualization.png')
         else:
-            plt.savefig('heatmap.png')
+            plt.savefig('current_visualization.png')
             
         # Show the plot if it's the final one
         if final:
