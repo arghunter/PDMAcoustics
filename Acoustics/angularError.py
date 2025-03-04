@@ -1,5 +1,5 @@
 import numpy as np
-samplerate=(3.072/2)*10**6
+samplerate=(1.024)*10**6
 d=0.12
 c=340.3
 avg=0

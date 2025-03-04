@@ -22,12 +22,12 @@ def read_serial(port, baud_rate, output_file):
                     if elapsed_time > 0:
                         bps = total_bytes / elapsed_time
                         print(f"Bytes per second: {bps:.2f}", end='\r')
-                    for value in int_values:
-                        if expected_value is not None and value != expected_value:
-                            print(f"Discontinuity detected: Expected {expected_value}, but got {value}")
-                        expected_value = (value + 1) % 256  # Wrap around at 255
+                    # for value in int_values:
+                    #     if expected_value is not None and value != expected_value:
+                    #         print(f"Discontinuity detected: Expected {expected_value}, but got {value}")
+                    #     expected_value = (value + 1) % 256  # Wrap around at 255
                     # print(" ".join(map(str, int_values)), flush=True)
-                    file.write(" ".join(map(str, int_values)) + "\n")
+                    # file.write(" ".join(map(str, int_values)) + "\n")
     except serial.SerialException as e:
         print(f"Serial error: {e}")
     except KeyboardInterrupt:

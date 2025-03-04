@@ -131,7 +131,7 @@ def receive_uart_data_to_csv(port, baudrate=9600, timeout=1, output_file=None):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='UART Receiver for 32-bit data')
     parser.add_argument('port', help='Serial port (e.g., COM3 or /dev/ttyUSB0)', default="COM9")
-    parser.add_argument('-b', '--baudrate', type=int, default=921600, 
+    parser.add_argument('-b', '--baudrate', type=int, default=3000000, 
                         help='Baud rate (default: 921600)')
     parser.add_argument('-t', '--timeout', type=int, default=1, 
                         help='Serial timeout in seconds (default: 1)')
