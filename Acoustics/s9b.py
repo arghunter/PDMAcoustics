@@ -25,6 +25,7 @@ def process_file(input_filename, output_filename, wav_filename):
     
     # Normalize values to 16-bit PCM range (-32768 to 32767)
     values = np.array(values, dtype=np.float32)
+    print(np.average(np.abs(values)))
     max_val = max(abs(values.min()), abs(values.max()))
     if max_val > 0:
         values = (values / max_val) * 32767
@@ -42,8 +43,8 @@ def process_file(input_filename, output_filename, wav_filename):
     
     
 if __name__ == "__main__":
-    input_file = "output_pdm58.csv"  # Change this to your actual filename
-    output_file = "output_59.csv"
-    wav_file = "output139.wav"
+    input_file = "output_pixel82.csv"  # Change this to your actual filename
+    output_file = "output_82.csv"
+    wav_file = "output162.wav"
     process_file(input_file, output_file, wav_file)
     print(f"Data saved to {output_file} and {wav_file}")

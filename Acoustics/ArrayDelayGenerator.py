@@ -5,7 +5,7 @@ from OldBitstreamBeamformer import Beamformer
 spacing=np.array([[-0.06,-0.24,0],[-0.18,-0.24,0],[-0.06,-0.12,0],[-0.18,-0.12,0],[-0.06,0,0],[-0.18,0,0],[-0.06,0.12,0],[-0.18,0.12,0],[0.18,-0.24,0],[0.06,-0.24,0],[0.18,-0.12,0],[0.06,-0.12,0],[0.18,0,0],[0.06,0,0],[0.18,0.12,0],[0.06,0.12,0]])
 
 n_channels=16
-samplerate=24000*64
+samplerate=16000*64
 segments=16
 fov=120
 
@@ -33,7 +33,7 @@ for i in range(segments):
     azi+=fov/segments
 
 for ch in range(n_channels):
-    with open(f"shiftshalf_channel_{ch}.txt", "w") as f:
+    with open(f"shiftsthurd_channel_{ch}.txt", "w") as f:
         for i in range(segments):
             for j in range(segments):
                 f.write(str(hex(int(shifts[i][j][ch])))+",\n")
