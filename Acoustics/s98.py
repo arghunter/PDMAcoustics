@@ -21,7 +21,7 @@ def process_and_plot_heatmap(csv_file):
     # Populate the grid with values
     for _, row in df.iterrows():
         pt = int(row["Sequence"])
-        pdata[int(pt / 16)][int(pt % 16)] = row["Value"]
+        pdata[int(pt / 16)][int(pt % 16)] = (row["Value"])
     
     # Plot heatmap
     plt.figure(figsize=(8, 6))
