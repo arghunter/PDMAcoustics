@@ -23,6 +23,7 @@ class SerialHeatmapVisualizer:
         self.seq_count = 0
         self.max_val_buf=np.zeros(200)
         self.buf_i=0
+        
         # Create initial heatmap
         self.heatmap = self.ax.imshow(
             self.heatmap_data, 
