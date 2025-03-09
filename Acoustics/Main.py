@@ -26,12 +26,12 @@ for i in range(segments):
     for j in range(segments):
 
 
-        print(i)
+        # print(i)
         t1=time.time()
         beam.update_delays(azi+(fov/segments)/2,ele+(fov/segments)/2)
         outdata=beam.beamform(data.T)
         outdatapcm=cic.cic(outdata)
-        print(time.time()-t1)
+        # print(time.time()-t1)
         for k in range(time_segs-1):
             
             rms_data[i][j][k]=np.mean(outdatapcm[k*sample_count:(k+1)*sample_count]**2)
@@ -39,7 +39,7 @@ for i in range(segments):
         
         
         ele+=fov/segments
-        print(rms_data)
+        print(str(i)+","+str(j))
     ele=-fov/2
     azi+=fov/segments
 print(rms_data)

@@ -43,8 +43,8 @@ def process_file(input_filename, output_filename, wav_filename):
     
     
 if __name__ == "__main__":
-    input_file = "output_pixel82.csv"  # Change this to your actual filename
-    output_file = "output_82.csv"
-    wav_file = "output162.wav"
+    input_file = "output_pixel87.csv"  # Change this to your actual filename
+    output_file = "output_87.csv"
+    wav_file = "output167.wav"
     process_file(input_file, output_file, wav_file)
     print(f"Data saved to {output_file} and {wav_file}")

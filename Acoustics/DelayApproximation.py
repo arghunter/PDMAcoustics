@@ -1,6 +1,6 @@
 # Make something where oyu pass in source coords and the coord of the mics and then i calculates the time diff from each mic from the first mic
 import numpy as np
-v=343
+v=340.3
 class DelayAproximator:
 
     def __init__(self,coords) :
@@ -40,8 +40,8 @@ class DelayAproximator:
             delayx[iter]=(((np.cos(np.radians(azimuth)+np.pi/2)*mic_pos[0])/v))
             delayy[iter]=(((np.cos(np.radians(elevation)+np.pi/2)*mic_pos[1])/v))
             iter+=1
-        delayx+=min(delayx)
-        delayy+=min(delayy)
+        delayx-=min(delayx)
+        delayy-=min(delayy)
         iter=0
         delays=np.sqrt(delayx**2+delayy**2)
         

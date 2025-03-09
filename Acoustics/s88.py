@@ -25,8 +25,8 @@ class SerialHeatmapVisualizer:
         # Create initial heatmap
         self.heatmap = self.ax.imshow(
             self.heatmap_data, 
-            cmap='viridis', 
-            interpolation='nearest',
+            cmap='jet', 
+            interpolation='bilinear',
             vmin=-32768,  # Initial scale for 16-bit values
             vmax=32767
         )
@@ -85,18 +85,21 @@ class SerialHeatmapVisualizer:
         
         # Update heatmap data
         for seq_num, value in processed_values:
-            row = seq_num // self.grid_size
-            col = seq_num % self.grid_size
+            row = 15-(seq_num // self.grid_size)
+            col = 15-(seq_num % self.grid_size)
             if 0 <= row < self.grid_size and 0 <= col < self.grid_size:
-                self.heatmap_data[row, col] = np.log((value)+0.0001)        
+                self.heatmap_data[row, col] = (value+1)#(0.001+self.heatmap_data[row, col])/10+value        
         # Dynamically adjust color scale
-        vmin = 0.1
-        vmax = 5
+        # self.heatmap_data-=(self.heatmap_data[7][7]+self.heatmap_data[7][8]+self.heatmap_data[8][7]+self.heatmap_data[8][8])/4
+        vmin = np.min(self.heatmap_data)
+        # vmax =(np.max(self.heatmap_data))
+        vmax=12000
+        print(np.max(self.heatmap_data))
         # print(vmax)
         self.heatmap.set_clim(vmin, vmax)
         
         # Update plot data
-        self.heatmap.set_array(self.heatmap_data)
+        self.heatmap.set_array(self.heatmap_data.T)
         self.seq_count += 1
         self.ax.set_title(f'Real-time Sensor Heatmap (Frame {self.seq_count})')
         

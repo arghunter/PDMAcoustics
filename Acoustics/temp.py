@@ -1,90 +1,45 @@
 import numpy as np
 
-def estimate_pdm_energy(pdm_signal, window_size):
-    """
-    Estimate the energy of a PDM bitstream without full PCM reconstruction.
-    
-    Args:
-        pdm_signal (numpy array): Binary PDM bitstream (array of 0s and 1s).
-        window_size (int): Number of samples per energy estimation window.
-    
-    Returns:
-        energy_values (numpy array): Estimated energy values over time.
-    """
-    # Convert PDM {0,1} to {-1,1} for zero-mean assumption
-    pdm_centered = 2 * pdm_signal - 1  
-    
-    # Compute the running sum over window_size
-    print(pdm_centered)
-    energy_values = np.convolve(pdm_centered, np.ones(window_size), mode='valid') 
-    
-    # Square the values to get energy
-    energy_values = energy_values ** 2  
-    
-    return energy_values
+# Define parameters
+from OldBitstreamBeamformer import Beamformer
 
-# Example usage:
-np.random.seed(42)  # For reproducibility
-pdm_stream = np.random.choice([0, 1], size=10000, p=[0.5, 0.5])  # Simulated PDM signal
-window_size = 64  # Choose a reasonable window size
-energy_estimates = estimate_pdm_energy(pdm_stream, window_size)
+spacing=np.array([[-0.06,-0.18,0],[-0.18,-0.18,0],[-0.06,-0.06,0],[-0.18,-0.06,0],[-0.06,0.06,0],[-0.18,0.06,0],[-0.06,0.18,0],[-0.18,0.18,0],[0.18,-0.18,0],[0.06,-0.18,0],[0.18,-0.06,0],[0.06,-0.06,0],[0.18,0.06,0],[0.06,0.06,0],[0.18,0.18,0],[0.06,0.18,0]])
 
-# Print first few values
-print(energy_estimates[:10])
+n_channels=16
+samplerate=16000*64
+segments=16
+fov=120
 
-def get_data(filename, channel, length):
-
-    i = 0  # Track the bit index in the file
-    j = 0  # Track the index in the output data array
-    data = np.zeros((length,))
-    
-    with open(filename, 'r') as file:
-        while j < length:  # Stop when the desired length is reached
-            line = file.readline()
-            if not line:  # End of file
-                break
-            
-            # Extract data for the specified channel
-            if i % 2 == channel:  # Select bits based on DDR format
-                
-                v=int(line.strip())  # Convert line to int and store in data
-                # data[j]=v
-                if(v==-1):
-                    data[j]=0
-                else:
-                    data[j]=1
-                j += 1  # Increment output index
-            
-            i += 1  # Increment bit index
-
-    return data
+beam=Beamformer(n_channels=n_channels,coord=spacing,sample_rate=samplerate)
 
 
+azi = -fov / 2
+ele = -fov / 2
+# ele=-fov / 2
+shifts = np.zeros((segments, segments, n_channels), dtype=int)
 
+# Compute shifts
+for i in range(segments):
+    for j in range(segments):
+        print(f"Processing segment ({i}, {j})")
 
-samplerate=48000*64
-duration=2
+        # Update delays
+        # beam.update_delays(azi + (fov / segments) / 2, 0)
+        # beam.update_delays(0,ele + (fov / segments) / 2)
+        beam.update_delays(azi + (fov / segments) / 2,ele + (fov / segments) / 2)
+        shifts[i][j] = np.round(beam.calculate_channel_shift()).astype(int)
 
-data= np.zeros((16,int(samplerate*(duration))))
+        ele += fov / segments
 
+    ele = -fov / 2
+    azi += fov / segments
 
-# print(False==False)
-length=int(samplerate*duration)
-data[0]=get_data("./Acoustics/PDMTests/171/output_bit_1.txt",1,length)
+# Write to file after processing
+with open("shiftsboth.txt", "w") as f:
+    for i in range(segments):
+        for j in range(segments):
+            f.write(f"Segment ({i}, {j}): {', '.join(map(str, shifts[i][j].astype(int)))}\n")
 
-print("Stream 1 Complete")
-
-energy_estimates = estimate_pdm_energy(data[0], 128)
-import matplotlib.pyplot as plt
-
-# # Print first few values
-# for i in range(len(energy_estimates)):
-#     print(energy_estimates[i])
-plt.figure(figsize=(10, 5))
-plt.plot(energy_estimates, label="Estimated Energy", color='b')
-plt.xlabel("Time (samples)")
-plt.ylabel("Energy Estimate")
-plt.title("PDM Energy Estimation Over Time")
-plt.legend()
-plt.grid(True)
-plt.show()
+# Print min and max values
+print(f"Max shift value: {np.max(shifts)}")
+print(f"Min shift value: {np.min(shifts)}")
