@@ -22,7 +22,7 @@ def read_serial_and_write_csv(port, baudrate, output_file):
 if __name__ == "__main__":
     port = "COM9"  # Change this to match your system
     baudrate = 3000000
-    output_file = "output_pixel87.csv"
+    output_file = "output_pixel89.csv"
     
     try:
         read_serial_and_write_csv(port, baudrate, output_file)

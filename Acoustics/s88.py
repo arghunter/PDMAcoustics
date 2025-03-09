@@ -21,7 +21,8 @@ class SerialHeatmapVisualizer:
         self.heatmap_data = np.zeros((grid_size, grid_size))
         self.values_buffer = []
         self.seq_count = 0
-        
+        self.max_val_buf=np.zeros(200)
+        self.buf_i=0
         # Create initial heatmap
         self.heatmap = self.ax.imshow(
             self.heatmap_data, 
@@ -88,12 +89,17 @@ class SerialHeatmapVisualizer:
             row = 15-(seq_num // self.grid_size)
             col = 15-(seq_num % self.grid_size)
             if 0 <= row < self.grid_size and 0 <= col < self.grid_size:
-                self.heatmap_data[row, col] = (value+1)#(0.001+self.heatmap_data[row, col])/10+value        
+                self.heatmap_data[row, col] = self.heatmap_data[row, col]*0.6+0.4*(value+1)#(0.001+self.heatmap_data[row, col])/10+value        
         # Dynamically adjust color scale
         # self.heatmap_data-=(self.heatmap_data[7][7]+self.heatmap_data[7][8]+self.heatmap_data[8][7]+self.heatmap_data[8][8])/4
+        self.max_val_buf[self.buf_i]=np.max(self.heatmap_data)
+        self.buf_i+=1
+        if(self.buf_i==len(self.max_val_buf)):
+            self.buf_i=0
         vmin = np.min(self.heatmap_data)
-        # vmax =(np.max(self.heatmap_data))
-        vmax=12000
+        vmax =(np.max(self.max_val_buf))
+        # vmax=12000
+        
         print(np.max(self.heatmap_data))
         # print(vmax)
         self.heatmap.set_clim(vmin, vmax)
