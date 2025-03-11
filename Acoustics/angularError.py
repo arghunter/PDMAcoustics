@@ -1,6 +1,6 @@
 import numpy as np
-samplerate=(1.024)*10**6
-d=0.12
+samplerate=16000
+d=0.025
 c=340.3
 avg=0
 d0=[]
@@ -12,8 +12,8 @@ for i in range(90):
     f0= f_tdoa0*c/d
     f1=f_tdoa1*c/d
     
-    f_ang0=np.rad2deg(np.arccos(f_tdoa0*c/d))
-    f_ang1=np.rad2deg(np.arccos(f_tdoa1*c/d))
+    f_ang0=np.rad2deg(np.arccos(np.maximum(f_tdoa0*c/d,0)))
+    f_ang1=np.rad2deg(np.arccos(np.maximum(f_tdoa1*c/d,0)))
     d0.append(f_ang0)
     d1.append(f_ang1)
     if(not np.isnan(f_ang0)):

@@ -60,7 +60,7 @@ class HeatmapVisualizer(QMainWindow):
     """Main PyQt GUI with PyQtGraph for real-time heatmap visualization."""
     def __init__(self, port):
         super().__init__()
-        self.setWindowTitle("Real-time Sensor Heatmap")
+        self.setWindowTitle("Real-time Sound Heatmap")
         self.setGeometry(100, 100, 600, 600)
 
         self.grid_size = 16
@@ -102,7 +102,7 @@ class HeatmapVisualizer(QMainWindow):
         
         
         upscale_factor = 16  
-        data = zoom(data, upscale_factor, order=3) 
+        data = zoom(data, upscale_factor, order=1) 
         print(np.max(data))
         vmin, vmax = np.min(data), np.maximum(np.max(data),100)
         self.img_item.setImage(data.T, levels=(vmin, vmax))

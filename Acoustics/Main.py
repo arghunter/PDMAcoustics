@@ -4,17 +4,17 @@ import DataGatherer
 from OldBitstreamBeamformer import Beamformer
 import Visual
 spacing=np.array([[-0.06,-0.24,0],[-0.18,-0.24,0],[-0.06,-0.12,0],[-0.18,-0.12,0],[-0.06,0,0],[-0.18,0,0],[-0.06,0.12,0],[-0.18,0.12,0],[0.18,-0.24,0],[0.06,-0.24,0],[0.18,-0.12,0],[0.06,-0.12,0],[0.18,0,0],[0.06,0,0],[0.18,0.12,0],[0.06,0.12,0]])
-testNum=186
+testNum=185
 n_channels=16
 samplerate=48000*64
 duration=2
 subduration=2
-segments=7
+segments=16
 fov=180
 interpScale=4
 time_segs=int(np.ceil(subduration*10))
 sample_count=960
-rms_data=np.zeros((segments,segments,int(time_segs)))
+rms_data=np.zeros((segments,segments,1))
 
 beam=Beamformer(n_channels=n_channels,coord=spacing,sample_rate=samplerate)
 data=DataGatherer.get_multi_channel_data(testNum,samplerate,duration,subduration)
@@ -37,8 +37,8 @@ for i in range(segments):
         ik+=1
         for k in range(time_segs-1):
             
-            rms_data[i][j][k]=np.mean(outdatapcm[k*sample_count:(k+1)*sample_count]**2)
-        rms_data[i][j][time_segs-1]=np.mean(outdatapcm[(time_segs-1)*sample_count:]**2)
+            rms_data[i][j][0]+=np.mean(outdatapcm[k*sample_count:(k+1)*sample_count]**2)
+        rms_data[i][j][0]+=np.mean(outdatapcm[(time_segs-1)*sample_count:]**2)
         
         
         ele+=fov/segments

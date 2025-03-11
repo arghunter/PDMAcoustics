@@ -146,7 +146,7 @@ speech_swapped = signal.filtfilt(b, a, speech, axis=0)
 # spacing=np.array([[-0.1,-0.1,0],[-0.1,0.0,0],[-0.1,0.1,0],[0,-0.1,0],[0,0,0],[0,0.1,0],[0.1,-0.1,0],[0.1,0,0],[0.1,0.1,0]])
 beam=Beamformer(n_channels=16,coord=spacing)
 segments=7
-rms_data=np.zeros((segments,segments,20))
+rms_data=np.zeros((segments,segments,1))
 azi=-90
 ele=-90
 tarr=np.zeros(50)
@@ -168,7 +168,7 @@ for i in range(segments):
             sample=io.getNextSample()
             # sample[np.abs(sample) < (0.00063)] = 0
             outdata=beam.beamform(sample)
-            rms_data[j][i][k]+=np.mean(outdata**2)
+            rms_data[j][i][0]+=np.mean(outdata**2)
             k+=1
         ele+=180/segments
         tarr[ik]=time.time()-t1
@@ -177,6 +177,19 @@ for i in range(segments):
     azi+=180/segments
 print(tarr)
 print("hfhgfghfj")
+
+import Visual
+Visual.gen_anim(rms_data,segments,2.1,186,4,180)
+
+
+
+
+
+
+
+
+
+
 # # rms_data=np.array([[37.09039681, 37.09039732, 37.09039732, 37.09039732], [26.2475326,  37.46160062, 64.05876732, 75.13930766], [37.09039713, 64.0587671,  99.82954105, 54.64336452], [45.31064137, 70.59155776, 54.64336426, 29.43501057]])
 
 # import numpy as np

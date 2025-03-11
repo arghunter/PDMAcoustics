@@ -1,86 +1,63 @@
-import os
+
+
+import DataGatherer
+import numpy as np
+
+
+spacing=np.array([[-0.06,-0.24,0],[-0.18,-0.24,0],[-0.06,-0.12,0],[-0.18,-0.12,0],[-0.06,0,0],[-0.18,0,0],[-0.06,0.12,0],[-0.18,0.12,0],[0.18,-0.24,0],[0.06,-0.24,0],[0.18,-0.12,0],[0.06,-0.12,0],[0.18,0,0],[0.06,0,0],[0.18,0.12,0],[0.06,0.12,0]])
+testNum=185
+n_channels=16
+samplerate=48000*64
+duration=2
+subduration=2
+segments=16
+fov=180
+data=DataGatherer.get_multi_channel_data(testNum,samplerate,duration,subduration)
+
 import numpy as np
 import matplotlib.pyplot as plt
-import matplotlib.animation as animation
-from scipy.ndimage import zoom
-from queue import Queue
-import threading
-import time
 
-# Global queue for real-time RMS data updates
-rms_queue = Queue()
-
-def enqueue_rms_data(rms_data):
-    """ Add new RMS data to the queue for real-time visualization """
-    rms_queue.put(rms_data)
-
-def real_time_anim(segments, subduration, testNum, interpScale, fov):
-    os.makedirs(f"./Acoustics/PDMTests/{testNum}/rms_frames{segments}_{subduration}", exist_ok=True)
-
-    # Placeholder for first frame
-    initial_data = np.zeros((segments, segments))  # Assuming square grid
-    zoom_factors = (interpScale, interpScale)
-
-    # Interpolated grid dimensions
-    segments_azi, segments_ele = [int(dim * interpScale) for dim in initial_data.shape]
-    azi_angles = np.linspace(-int(fov / 2), int(fov / 2), segments_azi)
-    ele_angles = np.linspace(-int(fov / 2), int(fov / 2), segments_ele)
-    azi_grid, ele_grid = np.meshgrid(azi_angles, ele_angles)
-
-    # Ensure azi_grid and ele_grid match the expected shape for pcolormesh
-    azi_grid = azi_grid[:-1, :-1]  # Reduce by 1 in both dimensions
-    ele_grid = ele_grid[:-1, :-1]
-
-    # Create figure and axis
-    fig, ax = plt.subplots(figsize=(10, 7))
+def sliding_xor_sum(a, b):
+    """Computes the sliding XOR operation and sums the XOR results at each shift."""
+    len_a, len_b = len(a), len(b)
+    result_length = len_a + len_b - 1
+    shifts = np.arange(-len_a + 1, len_b)  # Shift indices
+    result = np.zeros(result_length, dtype=int)
     
-    # Generate a properly shaped initial heatmap
-    initial_rms_data = np.zeros((segments_azi - 1, segments_ele - 1))
-    im = ax.pcolormesh(azi_grid, ele_grid, initial_rms_data, shading='auto', cmap='viridis', vmin=0, vmax=1)
-    cbar = fig.colorbar(im, ax=ax, label="Normalized RMS Power")
+    # Pad 'b' with zeros to slide across 'a'
+    b_padded = np.pad(b, (len_a - 1, len_a - 1), mode='constant', constant_values=0)
+    
+    # Perform point-by-point XOR at each shift and sum the results
+    for i in range(result_length):
+        print(i)
+        shifted_b = b_padded[i:i+len_a]  # Take a sliding window of 'b'
+        xor_values = a ^ shifted_b       # Element-wise XOR
+        result[i] = np.sum(xor_values)   # Sum of XOR results
+    
+    return shifts, result
 
-    # Scatter point for max RMS power
-    max_point, = ax.plot([], [], 'ro', markersize=8, label="Strongest RMS Power")
-    ax.legend()
+# Example Usage
+a = data[1]
+b = data[3]
 
-    def update(_):
-        """ Updates the plot with new RMS data from the queue. """
-        if not rms_queue.empty():
-            rms_data = rms_queue.get()
+shifts, xor_sum_result = sliding_xor_sum(a, b)
 
-            # Interpolate new data
-            rms_data_interp = zoom(rms_data, zoom_factors, order=1)
+# Save to CSV
+data = np.column_stack((shifts, xor_sum_result))
+np.savetxt("xor_result.csv", data, delimiter=",", fmt="%d", header="Shift,XOR_Sum", comments="")
 
-            # Normalize (avoid division by zero)
-            if np.max(rms_data_interp) > 0:
-                rms_data_interp /= np.max(rms_data_interp)
+# Plotting
+plt.figure(figsize=(8, 4))
+plt.plot(shifts, xor_sum_result, marker='o', linestyle='-', color='b', label="XOR Sum")
+plt.xlabel("Shift")
+plt.ylabel("Sum of XORs")
+plt.title("Sliding XOR Sum vs. Shift")
+plt.grid(True, linestyle="--", alpha=0.6)
+plt.legend()
+plt.show()
 
-            # Ensure the shape matches (reduce by 1 in both dimensions)
-            rms_data_interp = rms_data_interp[:-1, :-1]
+print("Saved to xor_result.csv and plotted successfully!")
 
-            # Update heatmap
-            im.set_array(rms_data_interp.ravel())
 
-            # Find and update maximum power point
-            max_idx = np.unravel_index(np.argmax(rms_data_interp), rms_data_interp.shape)
-            max_azi = azi_angles[max_idx[1]]
-            max_ele = ele_angles[max_idx[0]]
-            max_point.set_data([max_azi], [max_ele])
 
-            ax.set_title(f"Real-Time RMS Power Distribution")
 
-        return im, max_point
-
-    ani = animation.FuncAnimation(fig, update, interval=200 / interpScale, blit=False)
-    plt.show()
-
-# Example usage (in a separate thread to simulate real-time updates)
-def simulate_real_time_data():
-    while True:
-        new_rms = np.random.rand(10, 10)  # Example: New 10x10 RMS power array
-        enqueue_rms_data(new_rms)
-        time.sleep(0.5)  # Simulate new data every 0.5s
-
-# Start real-time animation
-threading.Thread(target=simulate_real_time_data, daemon=True).start()
-real_time_anim(segments=10, subduration=5, testNum=1, interpScale=2, fov=60)
